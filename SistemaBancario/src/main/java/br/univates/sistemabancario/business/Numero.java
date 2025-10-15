@@ -9,23 +9,23 @@ import br.univates.alexandria.exceptions.NumeroContaInvalidoException;
 public class Numero {
     private final String num;
     private final int intNum;
+    private boolean definidoPeloUsuario;
     
-    //Constructor overload
+    // Construtor para quando o DAO vai gerar o número
     public Numero() throws NumeroContaInvalidoException{
-        int numeroGerado = AuxNumero.gerarUnico();
-        this.num = formatarString(numeroGerado);
-        this.intNum = numeroGerado;
+        this.intNum = 0;
+        this.num = formatarString(0);
+        this.definidoPeloUsuario = false;
     }
     
-    public Numero(int n, boolean verificarExistencia) throws NumeroContaInvalidoException{
-        if(n < 1 | n > 999999){
-            throw new NumeroContaInvalidoException("Informe um número de até 6 dígitos");
+    // Construtor para quando o usuário informa o número
+    public Numero(int n) throws NumeroContaInvalidoException {
+        if (n < 1 || n > 999999) {
+            throw new NumeroContaInvalidoException("Informe um número de 1 a 6 dígitos");
         }
-        
-        if (verificarExistencia) AuxNumero.verificaExiste(n);
-            
-        this.num = formatarString(n);
         this.intNum = n;
+        this.num = formatarString(n);
+        this.definidoPeloUsuario = true;
     }
     
     //Getter
@@ -35,6 +35,10 @@ public class Numero {
     
     public int getNumeroInt(){
         return this.intNum;
+    }
+
+    public boolean isDefinidoPeloUsuario() { 
+        return this.definidoPeloUsuario; 
     }
     
     /**

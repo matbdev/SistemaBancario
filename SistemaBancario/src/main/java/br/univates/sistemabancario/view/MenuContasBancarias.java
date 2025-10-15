@@ -16,10 +16,10 @@ public class MenuContasBancarias extends Menu {
     private final ContaBancariaDAO cbdao;
     
     // Construtor
-    public MenuContasBancarias(){
-        this.cdao = new CorrentistaDAO();
-        this.cbdao = new ContaBancariaDAO(this.cdao);
-        
+    public MenuContasBancarias(CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+        this.cdao = cdao;
+        this.cbdao = cbdao;
+
         setTitulo("Opções relacionadas à Conta Bancária");
         setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de contas bancárias ==");
         adicionarOpcoes();

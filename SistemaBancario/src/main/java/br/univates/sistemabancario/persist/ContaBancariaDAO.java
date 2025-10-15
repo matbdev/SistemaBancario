@@ -12,6 +12,7 @@ import br.univates.sistemabancario.business.ContaBancaria;
 import br.univates.sistemabancario.business.Numero;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 /**
  * Classe com a lógica de gravação (inexistente por enquanto)
@@ -20,6 +21,7 @@ import java.util.Collections;
 public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
     private static final Arquivo a = new Arquivo("conta_bancaria.dat");
     private final CorrentistaDAO cdao;
+    private static final Random random = new Random();
 
     /**
      * Construtor que recebe um cdao via injeção de dependência
@@ -30,11 +32,28 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
     }
 
     /**
-     * Construtor que não recebe um dao, mas cria por si só
-     * É útil para o caso de geração automático de número da conta
+     * Gera um número de conta único que ainda não existe no DAO.
+     * @return um número inteiro único.
+     * @throws NumeroContaInvalidoException - caso o número da conta for inválido
      */
-    public ContaBancariaDAO() {
-        this.cdao = new CorrentistaDAO();
+    public int gerarNumeroUnico() throws NumeroContaInvalidoException {
+        while (true) {
+            int numero = random.nextInt(999999) + 1; // Gera de 1 a 999999
+            if (this.read(numero) == null) {
+                return numero;
+            }
+        }
+    }
+
+    /**
+     * Verifica se o número já existe na base de dados
+     * @param n - inteiro representando o número
+     * @throws NumeroContaInvalidoException - caso o número já exista
+     */
+    private void verificaNumeroExiste(int n) throws NumeroContaInvalidoException {
+        if (this.read(n) != null) {
+            throw new NumeroContaInvalidoException("O número de conta " + n + " já existe na base de dados");
+        }
     }
     
     /**
@@ -101,9 +120,13 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      * @throws ContaJaExisteException - caso a conta já exista
      */
     @Override
-    public void create(ContaBancaria cb) throws ContaJaExisteException {
+    public void create(ContaBancaria cb) throws ContaJaExisteException, NumeroContaInvalidoException {
+        // Se a conta foi criada com um número específico, verifica se ele já existe
+        if (cb.getNumeroConta().isDefinidoPeloUsuario()) {
+            verificaNumeroExiste(cb.getNumeroContaInt());
+        }
+
         ArrayList<ContaBancaria> cbList = readAll();
-        
         if (cbList.contains(cb)) {
             throw new ContaJaExisteException("A conta de número " + cb.getNumeroContaFormatado() + " já existe.");
         }
@@ -170,7 +193,7 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      * @throws NumeroContaInvalidoException - caso o número for inválido
      */
     public ContaBancaria read(int numero) throws NumeroContaInvalidoException {
-        Numero numeroObj = new Numero(numero, false);
+        Numero numeroObj = new Numero(numero);
         return read(numeroObj);
     }
     

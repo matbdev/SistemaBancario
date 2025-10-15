@@ -178,38 +178,38 @@ public class TelaCadastroConta extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void botaoCadastroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCadastroActionPerformed
-        try{
+    private void botaoCadastroActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
             Pessoa correntista = (Pessoa) this.cbCorrentista.getSelectedItem();
             if (correntista == null) {
                 throw new Exception("Por favor, selecione um correntista.");
             }
-    
+
             String numeroStr = this.tfNumero.getText();
             String saldoStr = this.tfSaldo.getText();
             String limiteStr = this.tfLimite.getText();
             
-            // Verificar campos preenchidos
             boolean hasNumero = !numeroStr.isBlank();
-            boolean hasSaldo = !saldoStr.isBlank();
-            boolean hasLimite = !limiteStr.isBlank();
             
-            int numero = hasNumero ? Integer.parseInt(numeroStr) : 0;
-            double saldo = hasSaldo ? Double.parseDouble(saldoStr) : 0.0;
-            double limite = hasLimite ? Double.parseDouble(limiteStr) : 0.0;
+            // TypeCasting
+            double saldo = saldoStr.isBlank() ? 0.0 : Double.parseDouble(saldoStr);
+            double limite = limiteStr.isBlank() ? 0.0 : Double.parseDouble(limiteStr);
             
             ContaBancaria cb;
             
-            if (limite != 0) {
-                // Se tem limite, é uma ContaBancariaEspecial
-                if (hasNumero) cb = new ContaBancariaEspecial(correntista, limite, saldo, numero);
-                else cb = new ContaBancariaEspecial(correntista, limite, saldo);
-            } else {
-                if (hasNumero) cb = new ContaBancaria(correntista, saldo, numero);
-                else cb = new ContaBancaria(correntista, saldo);
+            // Cria a conta. Se o número não for fornecido, o construtor da ContaBancaria
+            // usará o new Numero(), que prepara o objeto para o DAO definir o número.
+            if (limite != 0) { // conta especial
+                cb = hasNumero 
+                    ? new ContaBancariaEspecial(correntista, limite, saldo, Integer.parseInt(numeroStr))
+                    : new ContaBancariaEspecial(correntista, limite, saldo);
+            } else { // conta normal
+                cb = hasNumero
+                    ? new ContaBancaria(correntista, saldo, Integer.parseInt(numeroStr))
+                    : new ContaBancaria(correntista, saldo);
             }
             
-            cbdao.create(cb);
+            cbdao.create(cb); 
             
             this.labelSuccessError.setText("Conta bancária adicionada com sucesso!");
             this.labelSuccessError.setForeground(Color.green);
@@ -217,16 +217,17 @@ public class TelaCadastroConta extends javax.swing.JDialog {
             this.tfNumero.setText("");
             this.tfSaldo.setText("");
             this.tfLimite.setText("");
-            carregarCorrentistas();
+            
+            this.cbCorrentista.setSelectedIndex(0);
             
         } catch (NumberFormatException nfe) {
-            this.labelSuccessError.setText("Erro: Saldo, número e limite devem ser valores numéricos.");
+            this.labelSuccessError.setText("<html>Erro: Saldo, número e limite devem ser valores numéricos válidos.</html>");
             this.labelSuccessError.setForeground(Color.red);
         } catch (Exception e) {
-            this.labelSuccessError.setText("<html> Erro: " + e.getMessage() + "</html>");
+            this.labelSuccessError.setText("<html>Erro: " + e.getMessage() + "</html>");
             this.labelSuccessError.setForeground(Color.red);
         }
-    }//GEN-LAST:event_botaoCadastroActionPerformed
+    }
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         // TODO add your handling code here:

@@ -19,9 +19,9 @@ public class MenuCorrentistas extends Menu {
     private final ContaBancariaDAO cbdao;
     
     // Construtor
-    public MenuCorrentistas(){
-        this.cdao = new CorrentistaDAO();
-        this.cbdao = new ContaBancariaDAO(this.cdao);
+    public MenuCorrentistas(CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+        this.cdao = cdao;
+        this.cbdao = cbdao;
 
         setTitulo("Opções relacionadas à Correntista");
         setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de correntistas ==");
@@ -42,7 +42,7 @@ public class MenuCorrentistas extends Menu {
      * Método privado responsável por abrir um dialog de cadastro de correntista
      */
     private void cadastrarCorrentista(){
-        JDialog dialog = new TelaCadastroCorrentista(null, new CorrentistaDAO());
+        JDialog dialog = new TelaCadastroCorrentista(null, this.cdao);
         dialog.setVisible(true);
     }
     
@@ -55,7 +55,7 @@ public class MenuCorrentistas extends Menu {
         if(cList.isEmpty()){
             Messages.infoMessage("Não há correntistas cadastrados");
         }else{
-            TelaEditarUsuario teu = new TelaEditarUsuario(null, new CorrentistaDAO());
+            TelaEditarUsuario teu = new TelaEditarUsuario(null, this.cdao);
             teu.setVisible(true);
         }
     }
@@ -76,7 +76,7 @@ public class MenuCorrentistas extends Menu {
                 boolean temConta = false;
                 
                 for(ContaBancaria cb : cbList){
-                    if(cb.getPessoa() == p){
+                    if(cb.getPessoa().equals(p)){
                         temConta = true;
                         break;
                     }
@@ -90,7 +90,7 @@ public class MenuCorrentistas extends Menu {
             if(filteredList.isEmpty()){
                 Messages.infoMessage("Não há correntistas sem conta bancária cadastrada");
             }else{
-                TelaDeletarUsuario tdu = new TelaDeletarUsuario(null, new CorrentistaDAO(), filteredList);
+                TelaDeletarUsuario tdu = new TelaDeletarUsuario(null, this.cdao, filteredList);
                 tdu.setVisible(true);
             }
         }

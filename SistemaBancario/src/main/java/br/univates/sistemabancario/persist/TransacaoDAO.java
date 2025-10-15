@@ -37,7 +37,7 @@ public class TransacaoDAO {
                         }
 
                         int numero = Integer.parseInt(tLine[0]);
-                        Numero nConta = new Numero(numero, false);
+                        Numero nConta = new Numero(numero);
 
                         long timestamp = Long.parseLong(tLine[1]);
                         Date d = new Date(timestamp);

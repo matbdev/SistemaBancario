@@ -19,7 +19,7 @@ public class ContaBancaria implements Comparable<ContaBancaria>{
         verificaSaldo(saldo, "O saldo é menor que 0, informe uma quantia válida.");
         this.pessoa = p;
         this.saldo = saldo;
-        this.nConta = new Numero(numero, true);
+        this.nConta = new Numero(numero);
     }
     
     public ContaBancaria(Pessoa p) throws NumeroContaInvalidoException{
@@ -36,7 +36,7 @@ public class ContaBancaria implements Comparable<ContaBancaria>{
     
     public ContaBancaria(Pessoa p, int numero) throws NumeroContaInvalidoException{
         this.pessoa = p;
-        this.nConta = new Numero(numero, true);
+        this.nConta = new Numero(numero);
     }
     
     public ContaBancaria(Pessoa p, Numero numero){
