@@ -19,7 +19,23 @@ import java.util.Collections;
  */
 public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
     private static final Arquivo a = new Arquivo("conta_bancaria.dat");
-    private final CorrentistaDAO cdao = new CorrentistaDAO();
+    private final CorrentistaDAO cdao;
+
+    /**
+     * Construtor que recebe um cdao via injeção de dependência
+     * @param cdao - objeto de CorrentistaDAO já instanciado
+     */
+    public ContaBancariaDAO(CorrentistaDAO cdao) {
+        this.cdao = cdao;
+    }
+
+    /**
+     * Construtor que não recebe um dao, mas cria por si só
+     * É útil para o caso de geração automático de número da conta
+     */
+    public ContaBancariaDAO() {
+        this.cdao = new CorrentistaDAO();
+    }
     
     /**
      * Método que retorna todos os registros

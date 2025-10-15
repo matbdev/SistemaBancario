@@ -18,13 +18,15 @@ import java.util.ArrayList;
 public class MenuBanco extends Menu {
     private final ContaBancaria cb;
     private final TransacaoDAO tdao = new TransacaoDAO();
+    private final ContaBancariaDAO cbdao;
     
     /**
      * Construtor que recebe cpf, nome, endereco e saldo e instancia classe
      * @param cb - conta bancária já instanciada
      */
-    public MenuBanco(ContaBancaria cb){
+    public MenuBanco(ContaBancaria cb, ContaBancariaDAO cbdao){
         this.cb = cb;
+        this.cbdao = cbdao;
         setTitulo("Escolha uma operação");
         setSubtitulo("== Escolha uma operação disponível para realizar na conta selecionada ==");
         adicionarOpcoes();
@@ -57,7 +59,6 @@ public class MenuBanco extends Menu {
             );
             
             this.cb.depositaValor(dQtde);
-            verificarStatus();
             this.tdao.create(
                     new Transacao(
                             dQtde, 
@@ -66,6 +67,9 @@ public class MenuBanco extends Menu {
                             this.cb.getNumeroConta()
                     )
             );
+            this.cbdao.update(this.cb); // atualiza conta no arquivo
+
+            verificarStatus();
                     
         }catch(SaldoInvalidoException e){
             Messages.errorMessage(e);
@@ -81,11 +85,10 @@ public class MenuBanco extends Menu {
         try{
             double dQtde = Inputs.Double(
                     "Informe a quantidade a ser sacada",
-                    "DEPÓSITO"
+                    "SAQUE"
             );
                     
             this.cb.sacarValor(dQtde);
-            verificarStatus();
             
             this.tdao.create(
                     new Transacao(
@@ -95,6 +98,9 @@ public class MenuBanco extends Menu {
                             this.cb.getNumeroConta()
                     )
             );
+            this.cbdao.update(this.cb);
+            
+            verificarStatus();
     
         }catch(SaldoInvalidoException e){
             Messages.errorMessage(e);

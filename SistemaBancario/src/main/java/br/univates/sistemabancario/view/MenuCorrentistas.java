@@ -15,11 +15,14 @@ import javax.swing.*;
  * @author mateus.brambilla
  */
 public class MenuCorrentistas extends Menu {
-    private final CorrentistaDAO cdao = new CorrentistaDAO();
-    private final ContaBancariaDAO cbdao = new ContaBancariaDAO();
+    private final CorrentistaDAO cdao;
+    private final ContaBancariaDAO cbdao;
     
     // Construtor
     public MenuCorrentistas(){
+        this.cdao = new CorrentistaDAO();
+        this.cbdao = new ContaBancariaDAO(this.cdao);
+
         setTitulo("Opções relacionadas à Correntista");
         setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de correntistas ==");
         adicionarOpcoes();

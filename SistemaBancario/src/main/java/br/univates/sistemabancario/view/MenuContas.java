@@ -39,7 +39,7 @@ public class MenuContas extends Menu {
      */
     public void rodaMenuBanco(ContaBancaria conta) {
         if (conta != null) {
-            MenuBanco m = new MenuBanco(conta);
+            MenuBanco m = new MenuBanco(conta, this.cbdao);
             m.gerarMenu();
             cbdao.update(conta);
         }

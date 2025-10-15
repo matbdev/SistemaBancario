@@ -12,11 +12,14 @@ import javax.swing.*;
  * @author mateus.brambilla
  */
 public class MenuContasBancarias extends Menu {
-    private final CorrentistaDAO cdao = new CorrentistaDAO();
-    private final ContaBancariaDAO cbdao = new ContaBancariaDAO();
+    private final CorrentistaDAO cdao;
+    private final ContaBancariaDAO cbdao;
     
     // Construtor
     public MenuContasBancarias(){
+        this.cdao = new CorrentistaDAO();
+        this.cbdao = new ContaBancariaDAO(this.cdao);
+        
         setTitulo("Opções relacionadas à Conta Bancária");
         setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de contas bancárias ==");
         adicionarOpcoes();
