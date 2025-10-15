@@ -4,7 +4,7 @@ import br.univates.sistemabancario.view.TelaPrincipal;
 
 /**
  * Ponto de entrada da aplicação
- * @author mateu
+ * @author mateus.brambilla
  */
 public class App {
     public static void main(String[] args) {
