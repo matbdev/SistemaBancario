@@ -15,7 +15,7 @@ import java.util.InputMismatchException;
  * @author mateus.brambilla
  */
 public class TransacaoDAO {
-    private static final Arquivo a = new Arquivo("transicao.dat");
+    private static final Arquivo a = new Arquivo("transacao.dat");
     
     /**
      * Método que retorna todos os valores
@@ -23,29 +23,40 @@ public class TransacaoDAO {
      */
     public ArrayList<Transacao> readAll(){
         ArrayList<Transacao> tList = new ArrayList<>();
-        String linha;
         
         if(a.abrirLeitura()){
-            while ((linha = a.lerLinha()) != null) {
-                String[] tLine = linha.split(";");
-                try {
-                    int numero = Integer.parseInt(tLine[0]);
-                    Numero nConta = new Numero(numero, false);
-                    
-                    long timestamp = Long.parseLong(tLine[1]);
-                    Date d = new Date(timestamp);
-                    
-                    double saldo = Double.parseDouble(tLine[2]);
-                    char indicador = tLine[3].charAt(0);
-                    
-                    tList.add(new Transacao(saldo, tLine[4], indicador, d, nConta));
-                } catch(InputMismatchException e){
-                    Messages.errorMessage("Erro de formatação de um dos campos do arquivo");
-                } catch(NumeroContaInvalidoException e){
-                    Messages.errorMessage(e);
+            try { // Garante que o finally será executado
+                String linha;
+                while ((linha = a.lerLinha()) != null) {
+                    try {
+                        String[] tLine = linha.split(";");
+                        
+                        if (tLine.length < 5) { // Proteção contra linhas mal formatadas
+                            Messages.errorMessage("Registro de transação mal formatado no arquivo. Linha ignorada.");
+                            continue;
+                        }
+
+                        int numero = Integer.parseInt(tLine[0]);
+                        Numero nConta = new Numero(numero, false);
+
+                        long timestamp = Long.parseLong(tLine[1]);
+                        Date d = new Date(timestamp);
+
+                        double valor = Double.parseDouble(tLine[2]);
+                        char indicador = tLine[3].charAt(0);
+
+                        tList.add(new Transacao(valor, tLine[4], indicador, d, nConta));
+                        
+                    } catch(NumberFormatException e){
+                        Messages.errorMessage("Erro de formatação de número em uma linha do arquivo de transações. Linha ignorada.");
+                    } catch(NumeroContaInvalidoException e){
+                        Messages.errorMessage(e.getMessage());
+                    }
                 }
+            } finally {
+                // Garante que o arquivo seja fechado, não importa o que aconteça.
+                a.fecharArquivo();
             }
-            a.fecharArquivo();
         }
         
         Collections.sort(tList);
@@ -58,17 +69,34 @@ public class TransacaoDAO {
      * @return transações realizadas pela conta
      */ 
     public ArrayList<Transacao> read(Numero n){
-        ArrayList<Transacao> tList = readAll();
+        ArrayList<Transacao> transacoesDaConta = new ArrayList<>();
         
-        ArrayList<Transacao> transacoes = new ArrayList<>();
-        
-        for(Transacao t : tList){
-            if(t.getNumero().equals(n)){
-                transacoes.add(t);
+        if (a.abrirLeitura()) {
+            try {
+                String linha;
+                while ((linha = a.lerLinha()) != null) {
+                    try {
+                        String[] tLine = linha.split(";");
+                        int numeroContaNoArquivo = Integer.parseInt(tLine[0]);
+
+                        if (numeroContaNoArquivo == n.getNumeroInt()) {
+                            long timestamp = Long.parseLong(tLine[1]);
+                            Date d = new Date(timestamp);
+                            double valor = Double.parseDouble(tLine[2]);
+                            char indicador = tLine[3].charAt(0);
+                            transacoesDaConta.add(new Transacao(valor, tLine[4], indicador, d, n));
+                        }
+                    } catch (Exception e) {
+                        // Ignora qualquer linha mal formatada para não interromper a busca
+                    }
+                }
+            } finally {
+                a.fecharArquivo();
             }
         }
         
-        return transacoes;
+        Collections.sort(transacoesDaConta);
+        return transacoesDaConta;
     }
     
     /**
@@ -76,24 +104,27 @@ public class TransacaoDAO {
      * @param t - transação a ser adicionada
      */
     public void create(Transacao t){
-        addOnArchive(t);
+        ArrayList<Transacao> tList = readAll();
+        tList.add(t);
+        saveAll(tList);
     }
     
     /**
-     * Método auxiliar que realiza o salvamento no arquivo
-     * Não existe append, só overwrite
-     * @param p - pessoa a ser adicionada
+     * Método privado que salva a lista inteira de transações no arquivo,
+     * sobrescrevendo o conteúdo anterior.
+     * @param tList - lista completa a ser salva.
      */
-    private void addOnArchive(Transacao t){
-        ArrayList<Transacao> tList = readAll();
-        tList.add(t);
-        
+    private void saveAll(ArrayList<Transacao> tList){
         if(a.abrirEscrita()){
-            for (Transacao tra : tList) {
-                a.escreverLinha(tra.getLineForSave());
+            try {
+                for (Transacao tra : tList) {
+                    a.escreverLinha(tra.getLineForSave());
+                }
+            } finally {
+                // Garante que o arquivo seja fechado.
+                a.fecharArquivo();
             }
         }
-        a.fecharArquivo();
     }
 }
     
