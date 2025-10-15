@@ -29,7 +29,7 @@ public class MenuContasBancarias extends Menu {
      * Método privado responsável por adicionar as opções no menu
      */
     private void adicionarOpcoes(){
-        addOption("Cadastrar Conta Bancária", 'b', () -> cadastrarContaBancaria());
+        addOption("Cadastrar Conta Bancária", 'c', () -> cadastrarContaBancaria());
         addOption("Manusear Contas Bancárias", 'm', () -> manusearContas());
         addLastOption();
     }
