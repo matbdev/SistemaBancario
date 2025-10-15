@@ -128,7 +128,7 @@ public class ContaBancaria implements Comparable<ContaBancaria>{
     }
     
     public String getLineForSave(){
-        return getPessoa().getCpfNumbers() + ";" + getNumeroContaInt() + ";" + getSaldo() + ";" + getLimite();
+        return getPessoa().getCpfNumbers() + ";" + getNumeroContaInt() + ";" + getSaldo() + ";" + getLimite() + ";" + getTipoConta();
     }
     
     // Setter

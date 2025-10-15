@@ -9,6 +9,7 @@ import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.tools.Arquivo;
 import br.univates.alexandria.tools.Messages;
 import br.univates.sistemabancario.business.ContaBancaria;
+import br.univates.sistemabancario.business.ContaBancariaEspecial;
 import br.univates.sistemabancario.business.Numero;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,9 +95,15 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
                         int numero = Integer.parseInt(cbLine[1]);
                         double saldo = Double.parseDouble(cbLine[2]);
                         double limite = Double.parseDouble(cbLine[3]);
+                        String tipoConta = cbLine[4];
                         
-                        ContaBancaria cb = new ContaBancaria(pEncontrada, saldo, numero);
-                        cb.setLimite(limite);
+                        ContaBancaria cb;
+                        if (tipoConta.equals("ContaBancariaEspecial")) {
+                            cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, numero);
+                        } else {
+                            cb = new ContaBancaria(pEncontrada, saldo, numero);
+                        }
+                        
                         cbList.add(cb);
                         
                     } catch (NumberFormatException e) {
