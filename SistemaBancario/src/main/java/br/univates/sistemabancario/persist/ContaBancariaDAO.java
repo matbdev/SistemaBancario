@@ -124,6 +124,9 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
         // Se a conta foi criada com um número específico, verifica se ele já existe
         if (cb.getNumeroConta().isDefinidoPeloUsuario()) {
             verificaNumeroExiste(cb.getNumeroContaInt());
+        } else {
+            int numeroUnico = gerarNumeroUnico();
+            cb.getNumeroConta().setNumero(numeroUnico); // Atribui o número gerado ao objeto da conta
         }
 
         ArrayList<ContaBancaria> cbList = readAll();

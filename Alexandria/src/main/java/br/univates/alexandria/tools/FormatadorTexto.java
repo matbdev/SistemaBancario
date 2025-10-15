@@ -1,7 +1,5 @@
 package br.univates.alexandria.tools;
 
-import br.univates.alexandria.exceptions.ElementoVazioException;
-
 /**
  * Método que fornece conversores de texto
  * @author mateus.brambilla

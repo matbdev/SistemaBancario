@@ -7,8 +7,8 @@ import br.univates.alexandria.exceptions.NumeroContaInvalidoException;
  * @author mateus.brambilla
  */
 public class Numero {
-    private final String num;
-    private final int intNum;
+    private String num;
+    private int intNum;
     private boolean definidoPeloUsuario;
     
     // Construtor para quando o DAO vai gerar o número
@@ -26,6 +26,21 @@ public class Numero {
         this.intNum = n;
         this.num = formatarString(n);
         this.definidoPeloUsuario = true;
+    }
+
+    /**
+     * Define o número da conta. Este método foi projetado para ser chamado
+     * apenas uma vez pelo DAO durante a criação da conta. Uma vez definido,
+     * o número não pode ser alterado novamente.
+     * @param n O número único da conta.
+     */
+    public void setNumero(int n) {
+        // Verificação de segurança: só permite a definição se o número atual for 0 (o valor inicial).
+        if (this.intNum != 0) {
+            throw new IllegalStateException("O número da conta já foi definido e não pode ser alterado.");
+        }
+        this.intNum = n;
+        this.num = formatarString(n);
     }
     
     //Getter

@@ -99,20 +99,32 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
     }
     
     /**
-     * Método que recebe uma pessoa, nome e endereço e atualiza o cadastro do usuário
-     * @param p - objeto de pessoa, que vem deste próprio dao
+     * Método que recebe uma pessoa, nome e endereço e atualiza o cadastro do usuário.
+     * Retorna a instância da pessoa atualizada.
+     * @param p - objeto de pessoa original
      * @param nome - nome (novo ou corrente) da pessoa
      * @param endereco - endereço (novo ou corrente) da pessoa
+     * @return - instância da Pessoa com os dados atualizados, ou null se não for encontrada.
      */
-    public void update(Pessoa p, String nome, String endereco) {
-        ArrayList<Pessoa> pList = readAll(); // Lê a lista UMA VEZ
+    public Pessoa update(Pessoa p, String nome, String endereco) {
+        ArrayList<Pessoa> pList = readAll();
         int pIndex = pList.indexOf(p);
+        
         if (pIndex != -1) {
-            Pessoa pessoaLista = pList.get(pIndex);
-            pessoaLista.setEndereco(endereco);
-            pessoaLista.setNome(nome);
-            saveAll(pList); // Salva a lista inteira
+            Pessoa pessoaParaAtualizar = pList.get(pIndex);
+            
+            if (nome != null && !nome.isBlank()) {
+                pessoaParaAtualizar.setNome(nome);
+            }
+            if (endereco != null && !endereco.isBlank()) {
+                pessoaParaAtualizar.setEndereco(endereco);
+            }
+            
+            saveAll(pList);
+            return pessoaParaAtualizar; 
         }
+        
+        return null;
     }
     
     /**

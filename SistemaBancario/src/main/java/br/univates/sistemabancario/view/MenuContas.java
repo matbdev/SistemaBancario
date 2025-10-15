@@ -1,6 +1,5 @@
 package br.univates.sistemabancario.view;
 
-import br.univates.alexandria.tools.Messages;
 import br.univates.alexandria.view.Menu;
 import br.univates.sistemabancario.business.ContaBancaria;
 import br.univates.sistemabancario.persist.ContaBancariaDAO;
