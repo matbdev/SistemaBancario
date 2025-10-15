@@ -39,7 +39,7 @@ public class MenuContasBancarias extends Menu {
         if(cdao.readAll().isEmpty()){
             Messages.infoMessage("Não há correntistas cadastrados");
         }else{
-            JDialog dialog = new TelaCadastroConta(null, new CorrentistaDAO(), new ContaBancariaDAO());
+            JDialog dialog = new TelaCadastroConta(null, this.cdao, this.cbdao);
             dialog.setVisible(true);
         }
     }
@@ -52,7 +52,7 @@ public class MenuContasBancarias extends Menu {
         if(cbdao.readAll().isEmpty()){
             Messages.infoMessage("Não há contas bancárias cadastradas");
         }else{
-            MenuContas mc = new MenuContas();
+            MenuContas mc = new MenuContas(this.cbdao);
             mc.gerarMenu();
         }
     }

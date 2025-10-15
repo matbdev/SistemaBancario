@@ -11,9 +11,10 @@ import java.util.ArrayList;
  * @author mateus.brambilla
  */
 public class MenuContas extends Menu {
-    private final ContaBancariaDAO cbdao = new ContaBancariaDAO();
+    private final ContaBancariaDAO cbdao;
     
-    public MenuContas(){
+    public MenuContas(ContaBancariaDAO cbdao){
+        this.cbdao = cbdao;
         setTitulo("Escolha uma conta");
         setSubtitulo("== Escolha uma conta disponível para realizar movimentações ou consultar extrato ==");
         adicionarContas();
@@ -39,11 +40,8 @@ public class MenuContas extends Menu {
     public void rodaMenuBanco(ContaBancaria conta) {
         if (conta != null) {
             MenuBanco m = new MenuBanco(conta);
-            Messages.infoMessage("Conta escolhida com sucesso!");
-            m.verificarStatus();
             m.gerarMenu();
             cbdao.update(conta);
-            Messages.infoMessage("Alterações salvas no arquivo.");
         }
     }
 }

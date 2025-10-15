@@ -22,22 +22,28 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
      * @return arraylist dos valores
      */
     @Override
-    public ArrayList<Pessoa> readAll(){
+    public ArrayList<Pessoa> readAll() {
         ArrayList<Pessoa> pList = new ArrayList<>();
-        String linha;
-        
-        if(a.abrirLeitura()){
-            while ((linha = a.lerLinha()) != null) {
-                String[] p = linha.split(";");
-                try {
-                    pList.add(new Pessoa(p[0], p[1], p[2]));
-                } catch (CpfInvalidoException ex) {
-                    Messages.errorMessage("Correntista inválido de CPF " + p[0] + " encontrada.");
+        if (a.abrirLeitura()) {
+            try {
+                String linha;
+                while ((linha = a.lerLinha()) != null) {
+                    try {
+                        String[] p = linha.split(";");
+                        if (p.length < 3) {
+                            Messages.errorMessage("Registro de correntista mal formatado no arquivo. Linha ignorada.");
+                            continue;
+                        }
+
+                        pList.add(new Pessoa(p[0], p[1], p[2]));
+                    } catch (CpfInvalidoException ex) {
+                        Messages.errorMessage(ex);
+                    }
                 }
+            } finally {
+                a.fecharArquivo(); // Garante o fechamento do arquivo
             }
         }
-        a.fecharArquivo();
-        
         Collections.sort(pList);
         return pList;
     }
@@ -48,34 +54,33 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
      * @return a pessoa encontrada ou nulo
      */  
     @Override
-    public Pessoa read(CPF cpf){
-        ArrayList<Pessoa> pList = readAll();
-        
-        Pessoa pEncontrada = null;
-        for(Pessoa p : pList){
-            if(p.getCPF().equals(cpf)){
-                pEncontrada = p;
+    public Pessoa read(CPF cpf) {
+        if (a.abrirLeitura()) {
+            try {
+                String linha;
+                while ((linha = a.lerLinha()) != null) {
+                    try {
+                        String[] p = linha.split(";");
+                        if (p.length >= 1 && p[0].equals(cpf.getCpf())) {
+                            return new Pessoa(p[0], p[1], p[2]); // Encontrou, cria e retorna.
+                        }
+                    } catch (CpfInvalidoException ex) { /* Ignora linha inválida */ }
+                }
+            } finally {
+                a.fecharArquivo();
             }
         }
-        return pEncontrada;
+        return null; // Não encontrou
     }
-    
-    /**
+
+    /*
      * Método que retorna uma pessoa se já houver uma no banco de dados
      * com o mesmo CPF
      * @param pessoa - um objeto da classe Pessoa
      * @return a pessoa encontrada ou nulo
      */  
-    public Pessoa read(Pessoa pessoa){
-        ArrayList<Pessoa> pList = readAll();
-        
-        Pessoa pEncontrada = null;
-        for(Pessoa p : pList){
-            if(p.equals(pessoa)){
-                pEncontrada = p;
-            }
-        }
-        return pEncontrada;
+    public Pessoa read(Pessoa pessoa) {
+        return read(pessoa.getCPF()); // Reutiliza o método acima
     }
   
     /**
@@ -84,41 +89,13 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
      * @throws PessoaJaExisteException - caso a pessoa já existir
      */
     @Override
-    public void create(Pessoa p) throws PessoaJaExisteException{
-        if(read(p) == null) addOnArchive(p);
-        else throw new PessoaJaExisteException("A pessoa com CPF " + p.getCpfFormatado() + " já existe.");
-    }
-    
-    /**
-     * Método auxiliar que realiza o salvamento no arquivo
-     * Não existe append, só overwrite
-     * @param p - pessoa a ser adicionada
-     */
-    private void addOnArchive(Pessoa p){
+    public void create(Pessoa p) throws PessoaJaExisteException {
         ArrayList<Pessoa> pList = readAll();
+        if (pList.contains(p)) {
+            throw new PessoaJaExisteException("A pessoa com CPF " + p.getCpfFormatado() + " já existe.");
+        }
         pList.add(p);
-        
-        if(a.abrirEscrita()){
-            for (Pessoa pes : pList) {
-                a.escreverLinha(pes.getLineForSave());
-            }
-        }
-        a.fecharArquivo();
-    }
-    
-    /**
-     * Método auxiliar que realiza o salvamento no arquivo
-     * Não existe append, só overwrite
-     * Recebe um arraylist atualizado (em métodos update e delete)
-     * @param pList - arraylist a ser escrito
-     */
-    private void addOnArchive(ArrayList<Pessoa> pList){
-        if(a.abrirEscrita()){
-            for (Pessoa pes : pList) {
-                a.escreverLinha(pes.getLineForSave());
-            }
-        }
-        a.fecharArquivo();
+        saveAll(pList);
     }
     
     /**
@@ -127,16 +104,15 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
      * @param nome - nome (novo ou corrente) da pessoa
      * @param endereco - endereço (novo ou corrente) da pessoa
      */
-    public void update(Pessoa p, String nome, String endereco){
-        ArrayList<Pessoa> pList = readAll();
-        
+    public void update(Pessoa p, String nome, String endereco) {
+        ArrayList<Pessoa> pList = readAll(); // Lê a lista UMA VEZ
         int pIndex = pList.indexOf(p);
-        Pessoa pessoaLista = pList.get(pIndex);
-        
-        pessoaLista.setEndereco(endereco);
-        pessoaLista.setNome(nome);
-        
-        addOnArchive(pList);
+        if (pIndex != -1) {
+            Pessoa pessoaLista = pList.get(pIndex);
+            pessoaLista.setEndereco(endereco);
+            pessoaLista.setNome(nome);
+            saveAll(pList); // Salva a lista inteira
+        }
     }
     
     /**
@@ -146,6 +122,21 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
     public void delete(Pessoa p){
         ArrayList<Pessoa> pList = readAll();
         pList.remove(p);
-        addOnArchive(pList);
+        saveAll(pList);
+    }
+
+    /**
+     * Método privado que salva a lista inteira no arquivo, sobrescrevendo o conteúdo.
+     */
+    private void saveAll(ArrayList<Pessoa> pList) {
+        if (a.abrirEscrita()) {
+            try {
+                for (Pessoa pes : pList) {
+                    a.escreverLinha(pes.getLineForSave());
+                }
+            } finally {
+                a.fecharArquivo(); // Garante o fechamento do arquivo
+            }
+        }
     }
 }

@@ -45,8 +45,8 @@ public class TransacaoDAO {
                     Messages.errorMessage(e);
                 }
             }
+            a.fecharArquivo();
         }
-        a.fecharArquivo();
         
         Collections.sort(tList);
         return tList;

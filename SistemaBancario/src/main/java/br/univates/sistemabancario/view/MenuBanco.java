@@ -18,7 +18,6 @@ import java.util.ArrayList;
 public class MenuBanco extends Menu {
     private final ContaBancaria cb;
     private final TransacaoDAO tdao = new TransacaoDAO();
-    private final ContaBancariaDAO cbdao = new ContaBancariaDAO();
     
     /**
      * Construtor que recebe cpf, nome, endereco e saldo e instancia classe
