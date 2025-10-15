@@ -2,3 +2,9 @@
 Controle de Versão/
 *.dat
 *.form
+Alexandria/src/main/java/br/univates/alexandria/models/Cafeteira.java
+Alexandria/src/main/java/br/univates/alexandria/models/Contato.java
+Alexandria/src/main/java/br/univates/alexandria/models/Email.java
+Alexandria/src/main/java/br/univates/alexandria/models/Reservatorio.java
+Alexandria/src/main/java/br/univates/alexandria/models/Telefone.java
+Alexandria/src/main/java/br/univates/alexandria/models/Triangulo.java
