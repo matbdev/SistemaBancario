@@ -1,8 +1,8 @@
 package br.univates.sistemabancario.view;
 
-import br.univates.alexandria.tools.Messages;
-import br.univates.sistemabancario.persist.ContaBancariaDAO;
-import br.univates.sistemabancario.persist.CorrentistaDAO;
+import br.univates.alexandria.util.Messages;
+import br.univates.sistemabancario.repository.ContaBancariaDAO;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
 
 /**
  * Tela que serve para garantir estrutura da arquitetura do projeto

@@ -1,14 +1,15 @@
 package br.univates.sistemabancario.view;
 
 import br.univates.alexandria.exceptions.NullInputException;
-import br.univates.alexandria.exceptions.SaldoInvalidoException;
-import br.univates.alexandria.tools.Inputs;
-import br.univates.alexandria.tools.Messages;
+import br.univates.alexandria.util.Inputs;
+import br.univates.alexandria.util.Messages;
 import br.univates.alexandria.view.Menu;
-import br.univates.sistemabancario.business.ContaBancaria;
-import br.univates.sistemabancario.business.Transacao;
-import br.univates.sistemabancario.persist.ContaBancariaDAO;
-import br.univates.sistemabancario.persist.TransacaoDAO;
+import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.repository.ContaBancariaDAO;
+import br.univates.sistemabancario.repository.TransacaoDAO;
+import br.univates.sistemabancario.service.ContaBancaria;
+import br.univates.sistemabancario.service.Transacao;
+
 import java.util.ArrayList;
 
 /**

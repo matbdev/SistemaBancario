@@ -1,8 +1,9 @@
 package br.univates.alexandria.models;
 
 import br.univates.alexandria.exceptions.CpfInvalidoException;
-import br.univates.alexandria.tools.FormatadorTexto;
-import br.univates.alexandria.tools.Verificador;
+import br.univates.alexandria.util.FormatadorTexto;
+import br.univates.alexandria.util.Verificador;
+
 import java.util.Objects;
 
 /**

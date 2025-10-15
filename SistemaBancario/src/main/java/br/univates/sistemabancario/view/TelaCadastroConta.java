@@ -1,10 +1,11 @@
 package br.univates.sistemabancario.view;
 
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.business.ContaBancaria;
-import br.univates.sistemabancario.business.ContaBancariaEspecial;
-import br.univates.sistemabancario.persist.ContaBancariaDAO;
-import br.univates.sistemabancario.persist.CorrentistaDAO;
+import br.univates.sistemabancario.repository.ContaBancariaDAO;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
+import br.univates.sistemabancario.service.ContaBancaria;
+import br.univates.sistemabancario.service.ContaBancariaEspecial;
+
 import java.awt.Color;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;

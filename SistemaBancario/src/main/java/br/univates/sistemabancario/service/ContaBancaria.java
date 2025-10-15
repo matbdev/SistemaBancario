@@ -1,8 +1,8 @@
-package br.univates.sistemabancario.business;
+package br.univates.sistemabancario.service;
 
-import br.univates.alexandria.exceptions.NumeroContaInvalidoException;
-import br.univates.alexandria.exceptions.SaldoInvalidoException;
 import br.univates.alexandria.models.Pessoa;
+import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
+import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
 
 /**
  * Classe responsável por simular uma conta bancária simples

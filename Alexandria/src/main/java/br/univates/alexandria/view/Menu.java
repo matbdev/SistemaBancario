@@ -1,9 +1,10 @@
 package br.univates.alexandria.view;
 
 import br.univates.alexandria.models.Opcao;
-import br.univates.alexandria.tools.FormatadorTexto;
-import br.univates.alexandria.tools.Messages;
-import br.univates.alexandria.tools.Verificador;
+import br.univates.alexandria.util.FormatadorTexto;
+import br.univates.alexandria.util.Messages;
+import br.univates.alexandria.util.Verificador;
+
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 

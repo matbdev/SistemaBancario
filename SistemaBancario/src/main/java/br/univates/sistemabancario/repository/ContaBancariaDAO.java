@@ -1,16 +1,17 @@
-package br.univates.sistemabancario.persist;
+package br.univates.sistemabancario.repository;
         
-import br.univates.alexandria.dao.BaseDAO;
-import br.univates.alexandria.exceptions.ContaJaExisteException;
-import br.univates.alexandria.exceptions.NumeroContaInvalidoException;
-import br.univates.alexandria.exceptions.SaldoInvalidoException;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
-import br.univates.alexandria.tools.Arquivo;
-import br.univates.alexandria.tools.Messages;
-import br.univates.sistemabancario.business.ContaBancaria;
-import br.univates.sistemabancario.business.ContaBancariaEspecial;
-import br.univates.sistemabancario.business.Numero;
+import br.univates.alexandria.repository.BaseDAO;
+import br.univates.alexandria.util.Arquivo;
+import br.univates.alexandria.util.Messages;
+import br.univates.sistemabancario.exceptions.ContaJaExisteException;
+import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
+import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.service.ContaBancaria;
+import br.univates.sistemabancario.service.ContaBancariaEspecial;
+import br.univates.sistemabancario.service.Numero;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;

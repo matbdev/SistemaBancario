@@ -1,9 +1,10 @@
 package br.univates.sistemabancario.view;
 
-import br.univates.alexandria.tools.Messages;
+import br.univates.alexandria.util.Messages;
 import br.univates.alexandria.view.Menu;
-import br.univates.sistemabancario.persist.ContaBancariaDAO;
-import br.univates.sistemabancario.persist.CorrentistaDAO;
+import br.univates.sistemabancario.repository.ContaBancariaDAO;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
+
 import javax.swing.*;
 
 

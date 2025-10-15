@@ -1,8 +1,9 @@
 package br.univates.sistemabancario.view;
 
 import br.univates.alexandria.view.Menu;
-import br.univates.sistemabancario.business.ContaBancaria;
-import br.univates.sistemabancario.persist.ContaBancariaDAO;
+import br.univates.sistemabancario.repository.ContaBancariaDAO;
+import br.univates.sistemabancario.service.ContaBancaria;
+
 import java.util.ArrayList;
 
 /**

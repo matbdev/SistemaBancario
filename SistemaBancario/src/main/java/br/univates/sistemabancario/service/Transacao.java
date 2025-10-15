@@ -1,10 +1,11 @@
-package br.univates.sistemabancario.business;
+package br.univates.sistemabancario.service;
 
-import br.univates.alexandria.tools.FormatadorTexto;
-import br.univates.alexandria.tools.Verificador;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import br.univates.alexandria.util.FormatadorTexto;
+import br.univates.alexandria.util.Verificador;
 
 /**
  * Classe que representa uma movimentação de uma conta bancária

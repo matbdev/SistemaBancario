@@ -1,12 +1,13 @@
-package br.univates.sistemabancario.persist;
+package br.univates.sistemabancario.repository;
 
-import br.univates.alexandria.dao.BaseDAO;
 import br.univates.alexandria.exceptions.CpfInvalidoException;
-import br.univates.alexandria.exceptions.PessoaJaExisteException;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
-import br.univates.alexandria.tools.Arquivo;
-import br.univates.alexandria.tools.Messages;
+import br.univates.alexandria.repository.BaseDAO;
+import br.univates.alexandria.util.Arquivo;
+import br.univates.alexandria.util.Messages;
+import br.univates.sistemabancario.exceptions.PessoaJaExisteException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 

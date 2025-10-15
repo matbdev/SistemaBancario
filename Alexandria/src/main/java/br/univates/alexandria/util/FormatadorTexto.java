@@ -1,4 +1,4 @@
-package br.univates.alexandria.tools;
+package br.univates.alexandria.util;
 
 /**
  * Método que fornece conversores de texto

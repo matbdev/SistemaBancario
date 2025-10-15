@@ -1,4 +1,4 @@
-package br.univates.alexandria.dao;
+package br.univates.alexandria.repository;
 
 import br.univates.alexandria.exceptions.PersistenciaException;
 import java.util.ArrayList;

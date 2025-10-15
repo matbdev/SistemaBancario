@@ -1,8 +1,9 @@
 package br.univates.sistemabancario.view;
 
 import br.univates.alexandria.models.Pessoa;
-import br.univates.alexandria.tools.Messages;
-import br.univates.sistemabancario.persist.CorrentistaDAO;
+import br.univates.alexandria.util.Messages;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;

@@ -1,7 +1,8 @@
 package br.univates.sistemabancario.view;
 
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.persist.CorrentistaDAO;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
+
 import java.awt.Color;
 import javax.swing.JFrame;
 

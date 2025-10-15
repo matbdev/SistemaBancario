@@ -1,4 +1,6 @@
-package br.univates.alexandria.exceptions;
+package br.univates.sistemabancario.exceptions;
+
+import br.univates.alexandria.exceptions.PersistenciaException;
 
 /**
  * Exception para quando uma conta já existe na hora da adição no banco de dados

@@ -1,4 +1,6 @@
-package br.univates.alexandria.exceptions;
+package br.univates.sistemabancario.exceptions;
+
+import br.univates.alexandria.exceptions.PersistenciaException;
 
 /**
  * Exception personalizada para saldo

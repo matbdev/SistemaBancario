@@ -1,6 +1,6 @@
-package br.univates.sistemabancario.business;
+package br.univates.sistemabancario.service;
 
-import br.univates.alexandria.exceptions.NumeroContaInvalidoException;
+import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
 
 /**
  * Classe que representa um número da conta, podendo ser aleatório ou não

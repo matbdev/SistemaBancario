@@ -1,7 +1,7 @@
 package br.univates.alexandria.models;
 
-import br.univates.alexandria.tools.FormatadorTexto;
-import br.univates.alexandria.tools.Verificador;
+import br.univates.alexandria.util.FormatadorTexto;
+import br.univates.alexandria.util.Verificador;
 
 /**
  * Método que representa uma opção, com ícone, método e descrição
