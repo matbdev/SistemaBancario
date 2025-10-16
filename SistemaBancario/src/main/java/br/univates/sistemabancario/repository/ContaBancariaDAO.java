@@ -1,5 +1,9 @@
 package br.univates.sistemabancario.repository;
         
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.BaseDAO;
@@ -12,16 +16,12 @@ import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.ContaBancariaEspecial;
 import br.univates.sistemabancario.service.Numero;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 /**
  * Classe com a lógica de gravação (inexistente por enquanto)
  * @author mateus.brambilla
  */
 public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
-    private static final Arquivo a = new Arquivo("conta_bancaria.dat");
+    private static final Arquivo a = new Arquivo("resources/data/conta_bancaria.dat");
     private final CorrentistaDAO cdao;
     private static final Random random = new Random();
 

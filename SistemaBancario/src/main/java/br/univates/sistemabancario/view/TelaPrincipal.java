@@ -1,5 +1,10 @@
 package br.univates.sistemabancario.view;
 
+import java.util.ArrayList;
+
+import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
+
 import br.univates.alexandria.exceptions.NullInputException;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.util.Inputs;
@@ -11,9 +16,6 @@ import br.univates.sistemabancario.repository.CorrentistaDAO;
 import br.univates.sistemabancario.repository.TransacaoDAO;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.Transacao;
-
-import java.util.ArrayList;
-import javax.swing.*;
 
 /**
  * Tela que serve para garantir estrutura da arquitetura do projeto
@@ -102,8 +104,10 @@ public class TelaPrincipal {
             if(cdao.readAll().isEmpty()){
                 Messages.infoMessage("Não há correntistas cadastrados");
             }else{
-                JDialog dialog = new TelaCadastroConta(null, this.cdao, this.cbdao);
-                dialog.setVisible(true);
+                SwingUtilities.invokeLater(() -> {
+                    JDialog dialog = new TelaCadastroConta(null, this.cdao, this.cbdao);
+                    dialog.setVisible(true);
+                });
             }
         }
         
@@ -146,6 +150,7 @@ public class TelaPrincipal {
             addOption("Cadastrar Correntista", 'c', () -> cadastrarCorrentista());
             addOption("Editar Correntista", 'e', () -> editarCorrentista());
             addOption("Deletar Correntista", 'd', () -> deletarCorrentista());
+            addOption("Visualizar Correntistas", 'v', () -> visualizarCorrentistas());
             addLastOption();
         }
         
@@ -153,8 +158,10 @@ public class TelaPrincipal {
          * Método privado responsável por abrir um dialog de cadastro de correntista
          */
         private void cadastrarCorrentista(){
-            JDialog dialog = new TelaCadastroCorrentista(null, this.cdao);
-            dialog.setVisible(true);
+            SwingUtilities.invokeLater(() -> {
+                JDialog dialog = new TelaCadastroCorrentista(null, this.cdao);
+                dialog.setVisible(true);
+            });
         }
         
         /**
@@ -166,8 +173,10 @@ public class TelaPrincipal {
             if(cList.isEmpty()){
                 Messages.infoMessage("Não há correntistas cadastrados");
             }else{
-                TelaEditarUsuario teu = new TelaEditarUsuario(null, this.cdao);
-                teu.setVisible(true);
+                SwingUtilities.invokeLater(() -> {
+                    TelaEditarUsuario teu = new TelaEditarUsuario(null, this.cdao);
+                    teu.setVisible(true);
+                });
             }
         }
         
@@ -201,9 +210,35 @@ public class TelaPrincipal {
                 if(filteredList.isEmpty()){
                     Messages.infoMessage("Não há correntistas sem conta bancária cadastrada");
                 }else{
-                    TelaDeletarUsuario tdu = new TelaDeletarUsuario(null, this.cdao, filteredList);
-                    tdu.setVisible(true);
+                    SwingUtilities.invokeLater(() -> {
+                        TelaDeletarUsuario tdu = new TelaDeletarUsuario(null, this.cdao, filteredList);
+                        tdu.setVisible(true);
+                    });
                 }
+            }
+        }
+
+        /**
+         * Classe que itera por todos os registros de clientes e os lista
+         */
+        private void visualizarCorrentistas(){
+            ArrayList<Pessoa> cList = cdao.readAll();
+
+            if(cList.isEmpty()){
+                Messages.infoMessage("Não há nenhum correntista cadastrado");
+            }else{
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("== Correntistas Cadastrados ==\n\n");
+
+                
+                for(Pessoa p : cList) {
+                    sb.append(p);
+                    
+                    if(cList.indexOf(p) != cList.size() - 1) sb.append("\n");
+                }
+
+                Messages.infoMessage(sb.toString());
             }
         }
     }
@@ -225,7 +260,7 @@ public class TelaPrincipal {
         /**
          * Carrega as contas do DAO e as adiciona como opções no menu.
          */
-        public void adicionarContas(){
+        private void adicionarContas(){
             ArrayList<ContaBancaria> cbList = cbdao.readAll();
             
             for (ContaBancaria cb : cbList) {
@@ -239,7 +274,7 @@ public class TelaPrincipal {
          * Recebe uma conta bancária e abre o MenuBanco para ela.
          * @param conta - conta bancária selecionada pelo usuário.
          */
-        public void rodaMenuBanco(ContaBancaria conta) {
+        private void rodaMenuBanco(ContaBancaria conta) {
             if (conta != null) {
                 MenuBanco m = new MenuBanco(conta, this.cbdao);
                 m.gerarMenu();
@@ -267,11 +302,6 @@ public class TelaPrincipal {
             setTitulo("Escolha uma operação");
             setSubtitulo("== Escolha uma operação disponível para realizar na conta selecionada ==");
             adicionarOpcoes();
-        }
-        
-        // Getter
-        public ContaBancaria getContaBancaria(){
-            return this.cb;
         }
         
         /**
@@ -349,7 +379,7 @@ public class TelaPrincipal {
         /**
          * Método que informa o status da conta
          */
-        public void verificarStatus(){
+        private void verificarStatus(){
             Messages.infoMessage(this.cb.consultarStatus());
         }
         

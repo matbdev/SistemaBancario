@@ -1,10 +1,10 @@
 package br.univates.alexandria.models;
 
+import java.util.Objects;
+
 import br.univates.alexandria.exceptions.CpfInvalidoException;
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Verificador;
-
-import java.util.Objects;
 
 /**
  * Classe responsável por simbolizar uma pessoa simples

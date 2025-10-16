@@ -1,21 +1,21 @@
 package br.univates.sistemabancario.repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+
 import br.univates.alexandria.util.Arquivo;
 import br.univates.alexandria.util.Messages;
 import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
 import br.univates.sistemabancario.service.Numero;
 import br.univates.sistemabancario.service.Transacao;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-
 /**
  * Classe que realiza o salvamento das transações
  * @author mateus.brambilla
  */
 public class TransacaoDAO {
-    private static final Arquivo a = new Arquivo("transacao.dat");
+    private static final Arquivo a = new Arquivo("resources/data/transacao.dat");
     
     /**
      * Método que retorna todos os valores
@@ -86,7 +86,7 @@ public class TransacaoDAO {
                             char indicador = tLine[3].charAt(0);
                             transacoesDaConta.add(new Transacao(valor, tLine[4], indicador, d, n));
                         }
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
                         // Ignora qualquer linha mal formatada para não interromper a busca
                     }
                 }

@@ -1,11 +1,12 @@
 package br.univates.sistemabancario.view;
 
-import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.repository.CorrentistaDAO;
-
 import java.awt.Color;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
+
+import br.univates.alexandria.models.Pessoa;
+import br.univates.sistemabancario.repository.CorrentistaDAO;
 
 /**
  *
@@ -62,7 +63,7 @@ public class TelaEditarUsuario extends javax.swing.JDialog {
         labelCPF = new javax.swing.JLabel();
         labelNome = new javax.swing.JLabel();
         labelSuccessError = new javax.swing.JLabel();
-        cbCorrentista = new javax.swing.JComboBox<Pessoa>();
+        cbCorrentista = new javax.swing.JComboBox<>();
         tfNome = new javax.swing.JTextField();
         labelEndereco = new javax.swing.JLabel();
         tfEndereco = new javax.swing.JTextField();
@@ -74,6 +75,7 @@ public class TelaEditarUsuario extends javax.swing.JDialog {
         setBounds(new java.awt.Rectangle(0, 0, 0, 0));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
             }
@@ -86,6 +88,7 @@ public class TelaEditarUsuario extends javax.swing.JDialog {
         botaoCadastro.setText("Editar");
         botaoCadastro.setAutoscrolls(true);
         botaoCadastro.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botaoCadastroActionPerformed(evt);
             }

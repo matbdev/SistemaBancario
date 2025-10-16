@@ -1,5 +1,8 @@
 package br.univates.sistemabancario.repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import br.univates.alexandria.exceptions.CpfInvalidoException;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
@@ -8,15 +11,12 @@ import br.univates.alexandria.util.Arquivo;
 import br.univates.alexandria.util.Messages;
 import br.univates.sistemabancario.exceptions.PessoaJaExisteException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 /**
  * Classe que lida com a persistência para cadastro de correntista
  * @author mateus.brambilla
  */
 public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
-    private static final Arquivo a = new Arquivo("correntista.dat");
+    private static final Arquivo a = new Arquivo("resources/data/correntista.dat");
     
     /**
      * Método que retorna todos os valores
