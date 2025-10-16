@@ -2,7 +2,7 @@ package br.univates.sistemabancario;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import br.univates.sistemabancario.view.TelaPrincipalNewMenu;
+import br.univates.sistemabancario.view.tela.TelaPrincipalNewMenu;
 
 /**
  * Ponto de entrada da aplicação

@@ -1,4 +1,4 @@
-package br.univates.alexandria.models;
+package br.univates.alexandria.view;
 
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Verificador;
@@ -7,9 +7,7 @@ import br.univates.alexandria.util.Verificador;
  * Método que representa uma opção, com ícone, método e descrição
  * @author mateus.brambilla
  */
-public class OpcaoButton extends javax.swing.JButton{
-    public static final boolean ULTIMA_OPCAO = true;
-    
+public class OpcaoButton extends javax.swing.JButton{ 
     /**
      * Construtor que recebe as opções e as valida
      * @param descricao - descrição da opção

@@ -176,13 +176,22 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
                 while ((linha = a.lerLinha()) != null) {
                     try {
                         String[] cbLine = linha.split(";");
-                        if (cbLine.length >= 2 && Integer.parseInt(cbLine[1]) == numero.getNumeroInt()) {
+                        int num = Integer.parseInt(cbLine[1]);
+
+                        if (cbLine.length >= 2 && num == numero.getNumeroInt()) {
                             Pessoa pEncontrada = cdao.read(new CPF(cbLine[0]));
                             if (pEncontrada != null) {
                                 double saldo = Double.parseDouble(cbLine[2]);
                                 double limite = Double.parseDouble(cbLine[3]);
-                                ContaBancaria cb = new ContaBancaria(pEncontrada, saldo, numero.getNumeroInt());
-                                cb.setLimite(limite);
+                                String tipoConta = cbLine[4];
+
+                                ContaBancaria cb;
+                                if (tipoConta.equals("ContaBancariaEspecial")) {
+                                    cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, num);
+                                } else {
+                                    cb = new ContaBancaria(pEncontrada, saldo, num);
+                                }
+
                                 return cb; 
                             }
                         }
@@ -195,6 +204,48 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
             }
         }
         return null; // Não encontrou
+    }
+
+    /**
+     * Método que retorna uma ContaBancaria com base no correntista dela
+     * @param p - objeto de Pessoa instanciado
+     * @return lista de contas do correntista
+     */
+    public ArrayList<ContaBancaria> read(Pessoa p) {
+        ArrayList<ContaBancaria> cbList = new ArrayList<>();
+
+        if (a.abrirLeitura()) {
+            try {
+                String linha;
+                while ((linha = a.lerLinha()) != null) {
+                    try {
+                        String[] cbLine = linha.split(";");
+                        Pessoa pEncontrada = cdao.read(new CPF(cbLine[0]));
+
+                        if (pEncontrada.equals(p)) {
+                            int numero = Integer.parseInt(cbLine[1]);
+                            double saldo = Double.parseDouble(cbLine[2]);
+                            double limite = Double.parseDouble(cbLine[3]);
+                            String tipoConta = cbLine[4];
+                        
+                            ContaBancaria cb;
+                            if (tipoConta.equals("ContaBancariaEspecial")) {
+                                cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, numero);
+                            } else {
+                                cb = new ContaBancaria(pEncontrada, saldo, numero);
+                            }
+                        
+                            cbList.add(cb);
+                        }
+                    } catch (Exception e) { 
+                        /* Ignora linha mal formatada ou inválida */
+                    }
+                }
+            } finally {
+                a.fecharArquivo();
+            }
+        }
+        return cbList;
     }
     
     /**

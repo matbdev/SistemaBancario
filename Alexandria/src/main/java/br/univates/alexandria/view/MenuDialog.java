@@ -1,14 +1,8 @@
 package br.univates.alexandria.view;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Frame;
-import java.util.ArrayList;
 
-import javax.swing.Box;
-import javax.swing.JPanel;
-
-import br.univates.alexandria.models.OpcaoButton;
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Verificador;
 
@@ -16,8 +10,9 @@ import br.univates.alexandria.util.Verificador;
  * MenuDialog com implementação para GUI (JDialog)
  * @author mateus.brambilla
  */
-public class MenuDialog extends javax.swing.JDialog {
-    private MenuJPanel buttonsPanel = new MenuJPanel();
+public abstract class MenuDialog extends javax.swing.JDialog {
+    private MenuJPanel buttonsPanel;
+    private javax.swing.JLabel titleLabel;
 
     /**
      * Construtor que recebe o frame pai e se é modal ou não
@@ -78,6 +73,16 @@ public class MenuDialog extends javax.swing.JDialog {
     public void addCustomLastOption(String text, Runnable acao) {
         buttonsPanel.addOption(new OpcaoButton(text, acao), MenuJPanel.RED_COLOR_FOR_BUTTON);
     }
+
+    /**
+     * Adiciona uma opção completa ao menu, associando um ícone a um texto.
+     * @param text O texto descritivo da opção.
+     * @param acao A ação executada pela opção
+     * @param color A cor do botão
+     */
+    public void addOption(String text, Runnable acao, Color color) {
+        buttonsPanel.addOption(new OpcaoButton(text, acao), color);
+    }
     
     /**
     * Adiciona a opção final do menu, que por padrão é a de voltar.
@@ -96,14 +101,20 @@ public class MenuDialog extends javax.swing.JDialog {
      * Método principal de exibição do menu
      */
     public void exibir() {
-        buttonsPanel.renderMenu();
+        buttonsPanel.revalidate();
+        buttonsPanel.repaint();
+        pack();
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
-    private void initComponents() {
+    /**
+     * Método que inicializa os componentes da tela
+     */
+    protected void initComponents() {
         titleLabel = new javax.swing.JLabel();
+        buttonsPanel = new MenuJPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         
@@ -122,6 +133,4 @@ public class MenuDialog extends javax.swing.JDialog {
 
         setMinimumSize(new java.awt.Dimension(300, 200));
     }
-
-    private javax.swing.JLabel titleLabel;
 }
