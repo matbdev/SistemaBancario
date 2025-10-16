@@ -1,14 +1,15 @@
 package br.univates.sistemabancario.view;
 
+import java.awt.Color;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFrame;
+
 import br.univates.alexandria.models.Pessoa;
 import br.univates.sistemabancario.repository.ContaBancariaDAO;
 import br.univates.sistemabancario.repository.CorrentistaDAO;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.ContaBancariaEspecial;
-
-import java.awt.Color;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JFrame;
 
 /**
  *
@@ -61,7 +62,7 @@ public class TelaCadastroConta extends javax.swing.JDialog {
         labelSaldo = new javax.swing.JLabel();
         labelNumero = new javax.swing.JLabel();
         labelSuccessError = new javax.swing.JLabel();
-        cbCorrentista = new javax.swing.JComboBox<Pessoa>();
+        cbCorrentista = new javax.swing.JComboBox<>();
         tfNumero = new javax.swing.JTextField();
         labelLimite = new javax.swing.JLabel();
         tfLimite = new javax.swing.JTextField();
@@ -72,11 +73,6 @@ public class TelaCadastroConta extends javax.swing.JDialog {
         setBackground(new java.awt.Color(51, 51, 51));
         setBounds(new java.awt.Rectangle(0, 0, 0, 0));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                formKeyPressed(evt);
-            }
-        });
 
         labelCorrentista.setText("Informe o correntista:");
 
@@ -84,11 +80,7 @@ public class TelaCadastroConta extends javax.swing.JDialog {
         botaoCadastro.setForeground(new java.awt.Color(255, 255, 255));
         botaoCadastro.setText("Cadastrar");
         botaoCadastro.setAutoscrolls(true);
-        botaoCadastro.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoCadastroActionPerformed(evt);
-            }
-        });
+        botaoCadastro.addActionListener(evt -> botaoCadastroActionPerformed(evt));
 
         labelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -96,22 +88,8 @@ public class TelaCadastroConta extends javax.swing.JDialog {
 
         labelSaldo.setLabelFor(tfSaldo);
         labelSaldo.setText("Informe o saldo inicial (opcional):");
-
         labelNumero.setText("Informe o número da conta (opcional):");
-
-        cbCorrentista.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbCorrentistaActionPerformed(evt);
-            }
-        });
-
         labelLimite.setText("Em caso de conta especial, informe o limite (opcional):");
-
-        tfLimite.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfLimiteActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -227,18 +205,6 @@ public class TelaCadastroConta extends javax.swing.JDialog {
             this.labelSuccessError.setForeground(Color.red);
         }
     }
-
-    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_formKeyPressed
-
-    private void cbCorrentistaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCorrentistaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbCorrentistaActionPerformed
-
-    private void tfLimiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfLimiteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfLimiteActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoCadastro;

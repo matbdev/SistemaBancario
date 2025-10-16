@@ -9,7 +9,7 @@ import br.univates.alexandria.exceptions.NullInputException;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.util.Inputs;
 import br.univates.alexandria.util.Messages;
-import br.univates.alexandria.view.Menu;
+import br.univates.alexandria.view.MenuDialog;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
 import br.univates.sistemabancario.repository.ContaBancariaDAO;
 import br.univates.sistemabancario.repository.CorrentistaDAO;
@@ -21,35 +21,40 @@ import br.univates.sistemabancario.service.Transacao;
  * Tela que serve para garantir estrutura da arquitetura do projeto
  * @author mateus.brambilla
  */
-public class TelaPrincipal {
+public class TelaPrincipalNewMenu {
     public void iniciarMenuContas(){
         // Ingestão de dependências
         CorrentistaDAO cdao = new CorrentistaDAO();
         ContaBancariaDAO cbdao = new ContaBancariaDAO(cdao);
 
-        MenuContasCorrentistas m = new MenuContasCorrentistas(cdao, cbdao);
-        m.gerarMenu();
-
-        Messages.infoMessage("Saindo da aplicação...");
+        SwingUtilities.invokeLater(() -> {
+            MenuContasCorrentistas m = new MenuContasCorrentistas(cdao, cbdao);
+            m.exibir();
+            Messages.infoMessage("Saindo da aplicação...");
+        });
     }
 
     /**
      * Menu que separa as funções de correntista e conta bancária
      * @author mateus.brambilla
      */
-    public class MenuContasCorrentistas extends Menu {
+    public class MenuContasCorrentistas extends MenuDialog {
         private final CorrentistaDAO cdao;
         private final ContaBancariaDAO cbdao;
+
         /**
          * Construtor que inicializa a classe
          * Recebe objetos dos DAOs para preservar itens estáticos (arquivo)
          */
         public MenuContasCorrentistas(CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+            super(null, true);
+
             this.cdao = cdao;
             this.cbdao = cbdao;
+
+            setTitulo("Menu: Fluxos");
+            setSubtitulo("Escolha entre manusear correntistas ou contas");
             
-            setTitulo("Escolha uma opção");
-            setSubtitulo("== Escolha entre manusear correntistas ou contas bancárias ==");
             adicionarOpcoes();
         }
         
@@ -57,15 +62,19 @@ public class TelaPrincipal {
          * Método privado que adiciona as opções a este menu
          */
         private void adicionarOpcoes(){
-            addOption("Correntistas", 'c', () -> {
-                MenuCorrentistas mc = new MenuCorrentistas(this.cdao, this.cbdao);
-                mc.gerarMenu();
+            addOption("Correntistas", () -> {
+                SwingUtilities.invokeLater(() -> {
+                    MenuCorrentistas mc = new MenuCorrentistas(this.cdao, this.cbdao);
+                    mc.exibir();
+                });
             });
-            addOption("Contas Bancárias", 'b', () -> {
-                MenuContasBancarias mcb = new MenuContasBancarias(this.cdao, this.cbdao);
-                mcb.gerarMenu();
+            addOption("Contas Bancárias", () -> {
+                SwingUtilities.invokeLater(() -> {
+                    MenuContasBancarias mcb = new MenuContasBancarias(this.cdao, this.cbdao);
+                    mcb.exibir();
+                });
             });
-            addLastOption();
+            addCustomLastOption("Encerrar o programa", () -> this.dispose());
         }
     }
 
@@ -73,17 +82,19 @@ public class TelaPrincipal {
      * Menu responsável por mostrar opções referentes à contas bancárias
      * @author mateus.brambilla
      */
-    public class MenuContasBancarias extends Menu {
+    public class MenuContasBancarias extends MenuDialog {
         private final CorrentistaDAO cdao;
         private final ContaBancariaDAO cbdao;
         
         // Construtor
         public MenuContasBancarias(CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+            super(null, true);
+
             this.cdao = cdao;
             this.cbdao = cbdao;
 
-            setTitulo("Opções relacionadas à Conta Bancária");
-            setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de contas bancárias ==");
+            setTitulo("Menu: Conta Bancária");
+            setSubtitulo("Opções relacionadas à Conta Bancária");
             adicionarOpcoes();
         }
         
@@ -91,8 +102,8 @@ public class TelaPrincipal {
          * Método privado responsável por adicionar as opções no menu
          */
         private void adicionarOpcoes(){
-            addOption("Cadastrar Conta Bancária", 'c', () -> cadastrarContaBancaria());
-            addOption("Manusear Contas Bancárias", 'm', () -> manusearContas());
+            addOption("Cadastrar Conta Bancária", () -> cadastrarContaBancaria());
+            addOption("Manusear Contas Bancárias", () -> manusearContas());
             addLastOption();
         }
         
@@ -119,8 +130,10 @@ public class TelaPrincipal {
             if(cbdao.readAll().isEmpty()){
                 Messages.infoMessage("Não há contas bancárias cadastradas");
             }else{
-                MenuContas mc = new MenuContas(this.cbdao);
-                mc.gerarMenu();
+                SwingUtilities.invokeLater(() -> {
+                    MenuContas mc = new MenuContas(this.cbdao);
+                    mc.exibir();
+                });
             }
         }
     }
@@ -129,17 +142,19 @@ public class TelaPrincipal {
      * Menu responsável por mostrar opções referentes aos correntistas
      * @author mateus.brambilla
      */
-    public class MenuCorrentistas extends Menu {
+    public class MenuCorrentistas extends MenuDialog {
         private final CorrentistaDAO cdao;
         private final ContaBancariaDAO cbdao;
         
         // Construtor
         public MenuCorrentistas(CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+            super(null, true);
+
             this.cdao = cdao;
             this.cbdao = cbdao;
 
-            setTitulo("Opções relacionadas à Correntista");
-            setSubtitulo("== Escolha uma opção para modificar/adicionar cadastros de correntistas ==");
+            setTitulo("Menu: Correntista");
+            setSubtitulo("Opções relacionadas à Correntista");
             adicionarOpcoes();
         }
         
@@ -147,10 +162,10 @@ public class TelaPrincipal {
          * Método privado responsável por adicionar as opções no menu
          */
         private void adicionarOpcoes(){
-            addOption("Cadastrar Correntista", 'c', () -> cadastrarCorrentista());
-            addOption("Editar Correntista", 'e', () -> editarCorrentista());
-            addOption("Deletar Correntista", 'd', () -> deletarCorrentista());
-            addOption("Visualizar Correntistas", 'v', () -> visualizarCorrentistas());
+            addOption("Cadastrar Correntista", () -> cadastrarCorrentista());
+            addOption("Editar Correntista", () -> editarCorrentista());
+            addOption("Deletar Correntista", () -> deletarCorrentista());
+            addOption("Visualizar Correntistas", () -> visualizarCorrentistas());
             addLastOption();
         }
         
@@ -247,13 +262,16 @@ public class TelaPrincipal {
      * Classe que representa o menu de contas para escolha do usuário
      * @author mateus.brambilla
      */
-    public class MenuContas extends Menu {
+    public class MenuContas extends MenuDialog {
         private final ContaBancariaDAO cbdao;
         
         public MenuContas(ContaBancariaDAO cbdao){
+            super(null, true);
+
             this.cbdao = cbdao;
-            setTitulo("Escolha uma conta");
-            setSubtitulo("== Escolha uma conta disponível para realizar movimentações ou consultar extrato ==");
+            
+            setTitulo("Menu: Central de Contas");
+            setSubtitulo("Listagem de contas bancárias");
             adicionarContas();
         }
         
@@ -264,8 +282,7 @@ public class TelaPrincipal {
             ArrayList<ContaBancaria> cbList = cbdao.readAll();
             
             for (ContaBancaria cb : cbList) {
-                char icone = (char)(cbList.indexOf(cb) + '1');
-                addOption(cb.toString(), icone, () -> rodaMenuBanco(cb));
+                addOption(cb.toString(), () -> rodaMenuBanco(cb));
             }
             addLastOption();
         }
@@ -276,8 +293,10 @@ public class TelaPrincipal {
          */
         private void rodaMenuBanco(ContaBancaria conta) {
             if (conta != null) {
-                MenuBanco m = new MenuBanco(conta, this.cbdao);
-                m.gerarMenu();
+                SwingUtilities.invokeLater(() -> {
+                    MenuBanco m = new MenuBanco(conta, this.cbdao);
+                    m.exibir();
+                });
                 cbdao.update(conta);
             }
         }
@@ -287,7 +306,7 @@ public class TelaPrincipal {
      * Classe que herda de menu, representando a view do nosso banco
      * @author mateus.brambilla
      */
-    public class MenuBanco extends Menu {
+    public class MenuBanco extends MenuDialog {
         private final ContaBancaria cb;
         private final TransacaoDAO tdao = new TransacaoDAO();
         private final ContaBancariaDAO cbdao;
@@ -297,10 +316,13 @@ public class TelaPrincipal {
          * @param cb - conta bancária já instanciada
          */
         public MenuBanco(ContaBancaria cb, ContaBancariaDAO cbdao){
+            super(null, true);
+
             this.cb = cb;
             this.cbdao = cbdao;
-            setTitulo("Escolha uma operação");
-            setSubtitulo("== Escolha uma operação disponível para realizar na conta selecionada ==");
+
+            setTitulo("Menu: Operações Bancárias");
+            setSubtitulo("Operações de movimentação e visualização de conta");
             adicionarOpcoes();
         }
         
@@ -308,10 +330,10 @@ public class TelaPrincipal {
          * Método auxilair que adiciona as opções ao menu
          */
         private void adicionarOpcoes(){
-            addOption("Depositar valor", 'd', () -> depositarValor());
-            addOption("Sacar valor", 's', () -> sacarValor());
-            addOption("Verificar status", 'v', () -> verificarStatus());
-            addOption("Consultar logs", 'l', () -> consultarLogs());
+            addOption("Depositar valor", () -> depositarValor());
+            addOption("Sacar valor", () -> sacarValor());
+            addOption("Verificar status", () -> verificarStatus());
+            addOption("Consultar logs", () -> consultarLogs());
             addLastOption();
         }
         

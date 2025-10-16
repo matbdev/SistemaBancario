@@ -7,36 +7,19 @@ import br.univates.alexandria.util.Verificador;
  * Método que representa uma opção, com ícone, método e descrição
  * @author mateus.brambilla
  */
-public class Opcao {
-    private final char icone;
-    private final String descricao;
-    private final Runnable acao;
+public class OpcaoButton extends javax.swing.JButton{
+    public static final boolean ULTIMA_OPCAO = true;
     
     /**
      * Construtor que recebe as opções e as valida
-     * @param icone - letra da opção
      * @param descricao - descrição da opção
      * @param acao - acao da opção
      */
-    public Opcao(char icone, String descricao, Runnable acao){
-        Verificador.verificaVazio(icone, "Ícone vazio informado");
-        Verificador.verificaVazio(descricao, "Ícone vazio informado");
+    public OpcaoButton(String descricao, Runnable acao){
+        Verificador.verificaVazio(descricao, "Descrição vazia informado");
+        setText(FormatadorTexto.converteTitleCase(descricao));
         
-        this.icone = Character.toUpperCase(icone);
-        this.descricao = FormatadorTexto.converteTitleCase(descricao);
-        this.acao = acao;
-    }
-    
-    // Getters
-    public char getIcone() {
-        return icone;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-    
-    public void executarAcao() {
-        acao.run(); // Runnable -> contém run para executar
+        // Adiciona um ActionListener para tratar o clique
+        addActionListener(evt -> acao.run());
     }
 }

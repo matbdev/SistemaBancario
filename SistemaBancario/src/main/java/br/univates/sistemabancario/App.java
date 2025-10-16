@@ -2,7 +2,7 @@ package br.univates.sistemabancario;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import br.univates.sistemabancario.view.TelaPrincipal;
+import br.univates.sistemabancario.view.TelaPrincipalNewMenu;
 
 /**
  * Ponto de entrada da aplicação
@@ -12,7 +12,7 @@ public class App {
     public static void main(String[] args) {
         FlatDarkLaf.setup(); // Configuração e aplicação do FlatLaf
 
-        TelaPrincipal tp = new TelaPrincipal();
+        TelaPrincipalNewMenu tp = new TelaPrincipalNewMenu();
         tp.iniciarMenuContas();
     }
 }

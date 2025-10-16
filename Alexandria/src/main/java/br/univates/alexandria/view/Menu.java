@@ -1,12 +1,13 @@
 package br.univates.alexandria.view;
 
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
 import br.univates.alexandria.models.Opcao;
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Messages;
 import br.univates.alexandria.util.Verificador;
-
-import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  * Classe que gera um modelo padrão para criação de menus
