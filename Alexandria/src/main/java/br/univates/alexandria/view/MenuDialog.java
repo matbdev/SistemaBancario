@@ -17,14 +17,10 @@ import br.univates.alexandria.util.Verificador;
  * @author mateus.brambilla
  */
 public class MenuDialog extends javax.swing.JDialog {
-    public static final Color RED_COLOR_FOR_BUTTON = new Color(194, 72, 78);
-    public static final Color BLUE_COLOR_FOR_BUTTON = new Color(48, 55, 156);
-
-    private JPanel buttonsPanel;
-    private final ArrayList<OpcaoButton> opcoes = new ArrayList<>();
+    private MenuJPanel buttonsPanel = new MenuJPanel();
 
     /**
-     * Construtor que não recebe nada mas seta um título padrão
+     * Construtor que recebe o frame pai e se é modal ou não
      * @param parent - frame pai
      * @param modal - se é modal ou não
      */
@@ -35,7 +31,8 @@ public class MenuDialog extends javax.swing.JDialog {
     }
     
     /**
-     * Construtor que recebe subtitulo recebe nada mas seta um título padrão
+     * Construtor que recebe o frame pai e se é modal ou não
+     * Também recebe um subtítulo
      * @param parent - frame pai
      * @param modal - se é modal ou não
      * @param subtitulo - texto adicional
@@ -70,7 +67,7 @@ public class MenuDialog extends javax.swing.JDialog {
      * @param acao A ação executada pela opção
      */
     public void addOption(String text, Runnable acao) {
-        opcoes.add(new OpcaoButton(text, acao));
+        buttonsPanel.addOption(new OpcaoButton(text, acao));
     }
 
     /**
@@ -79,61 +76,27 @@ public class MenuDialog extends javax.swing.JDialog {
      * @param acao A ação executada pela opção
      */
     public void addCustomLastOption(String text, Runnable acao) {
-        OpcaoButton ob = new OpcaoButton(text, acao);
-        ob.setBackground(RED_COLOR_FOR_BUTTON);
-        opcoes.add(ob);
+        buttonsPanel.addOption(new OpcaoButton(text, acao), MenuJPanel.RED_COLOR_FOR_BUTTON);
     }
     
     /**
     * Adiciona a opção final do menu, que por padrão é a de voltar.
     * Esta opção não terá um espaçamento após ela.
     */
-   public void addLastOption() {
-        OpcaoButton ob = new OpcaoButton("Voltar à página anterior", () -> this.dispose());
-        ob.setBackground(RED_COLOR_FOR_BUTTON);
-
-        opcoes.add(ob);
+   public void addDefaultLastOption() {
+        buttonsPanel.addOption(
+            new OpcaoButton(
+                "Voltar à página anterior", 
+                () -> this.dispose()
+            ), MenuJPanel.RED_COLOR_FOR_BUTTON
+        );
    }
-    
-    /**
-     * Monta e retorna a string formatada do menu para exibição.
-     */
-    public void renderMenu(){
-        buttonsPanel.removeAll(); // Limpa painel de botões
-        
-        // Itera sobre todas as opções do modelo para adicioná-las
-        for (OpcaoButton ob : this.opcoes){
-            OpcaoButton button = ob;
-            
-            button.setAlignmentX(Component.CENTER_ALIGNMENT); // Centraliza no BoxLayout
-            
-            int buttonHeight = 30;
-            button.setMaximumSize(new java.awt.Dimension(Short.MAX_VALUE, buttonHeight));
-            button.setMinimumSize(new java.awt.Dimension(0, buttonHeight));
-            button.setPreferredSize(new java.awt.Dimension(0, buttonHeight)); 
-
-            if (this.opcoes.indexOf(ob) < this.opcoes.size() - 1) {
-                ob.setBackground(BLUE_COLOR_FOR_BUTTON);
-            }
-
-            // Adiciona o botão ao painel
-            buttonsPanel.add(button);
-            
-            if (this.opcoes.indexOf(ob) < this.opcoes.size() - 1) {
-                buttonsPanel.add(Box.createVerticalStrut(5));
-            }
-        }
-        
-        // Atualiza a visualização do painel
-        buttonsPanel.revalidate();
-        buttonsPanel.repaint();
-    }
     
     /**
      * Método principal de exibição do menu
      */
     public void exibir() {
-        renderMenu();
+        buttonsPanel.renderMenu();
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -141,11 +104,10 @@ public class MenuDialog extends javax.swing.JDialog {
 
     private void initComponents() {
         titleLabel = new javax.swing.JLabel();
-        buttonsPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         
-        titleLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); 
+        titleLabel.setFont(new java.awt.Font("Segoe UI", 1, 16)); 
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Menu Title"); 
         

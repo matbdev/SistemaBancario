@@ -104,7 +104,8 @@ public class TelaPrincipalNewMenu {
         private void adicionarOpcoes(){
             addOption("Cadastrar Conta Bancária", () -> cadastrarContaBancaria());
             addOption("Manusear Contas Bancárias", () -> manusearContas());
-            addLastOption();
+            addOption("Visualizar Contas Bancárias", () -> visualizarContas());
+            addDefaultLastOption();
         }
         
         /**
@@ -134,6 +135,31 @@ public class TelaPrincipalNewMenu {
                     MenuContas mc = new MenuContas(this.cbdao);
                     mc.exibir();
                 });
+            }
+        }
+
+        /**
+         * Método privado responsável pela visualização das contas bancárias
+         */
+        private void visualizarContas(){
+            if(cbdao.readAll().isEmpty()){
+                Messages.infoMessage("Não há contas bancárias cadastradas");
+            }else{
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("== Contas Bancárias Cadastradas\n\n");
+
+                ArrayList<ContaBancaria> cbList = cbdao.readAll();
+            
+                for (ContaBancaria cb : cbList) {
+                    sb.append(cb.toString());
+
+                    if (cbList.indexOf(cb) != cbList.size() - 1) {
+                        sb.append("\n");
+                    }
+                }
+
+                Messages.infoMessage(sb.toString());
             }
         }
     }
@@ -166,7 +192,7 @@ public class TelaPrincipalNewMenu {
             addOption("Editar Correntista", () -> editarCorrentista());
             addOption("Deletar Correntista", () -> deletarCorrentista());
             addOption("Visualizar Correntistas", () -> visualizarCorrentistas());
-            addLastOption();
+            addDefaultLastOption();
         }
         
         /**
@@ -284,7 +310,7 @@ public class TelaPrincipalNewMenu {
             for (ContaBancaria cb : cbList) {
                 addOption(cb.toString(), () -> rodaMenuBanco(cb));
             }
-            addLastOption();
+            addDefaultLastOption();
         }
         
         /**
@@ -334,7 +360,7 @@ public class TelaPrincipalNewMenu {
             addOption("Sacar valor", () -> sacarValor());
             addOption("Verificar status", () -> verificarStatus());
             addOption("Consultar logs", () -> consultarLogs());
-            addLastOption();
+            addDefaultLastOption();
         }
         
         /**
