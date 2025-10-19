@@ -2,7 +2,6 @@ package br.univates.alexandria.view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.ArrayList;
 
 import javax.swing.Box;
 
