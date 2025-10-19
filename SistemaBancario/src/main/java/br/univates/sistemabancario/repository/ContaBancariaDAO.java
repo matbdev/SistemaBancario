@@ -100,7 +100,13 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
                         
                         ContaBancaria cb;
                         if (tipoConta.equals("ContaBancariaEspecial")) {
-                            cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, numero);
+                            cb = new ContaBancariaEspecial(pEncontrada, limite, 0, numero);
+
+                            if (saldo > 0) {
+                                cb.depositaValor(saldo);
+                            } else if (saldo < 0) {
+                                cb.sacarValor(Math.abs(saldo));
+                            }
                         } else {
                             cb = new ContaBancaria(pEncontrada, saldo, numero);
                         }
@@ -230,7 +236,12 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
                         
                             ContaBancaria cb;
                             if (tipoConta.equals("ContaBancariaEspecial")) {
-                                cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, numero);
+                                cb = new ContaBancariaEspecial(pEncontrada, limite, 0, numero);
+                                if (saldo > 0) {
+                                    cb.depositaValor(saldo);
+                                } else if (saldo < 0) {
+                                    cb.sacarValor(Math.abs(saldo));
+                                }
                             } else {
                                 cb = new ContaBancaria(pEncontrada, saldo, numero);
                             }

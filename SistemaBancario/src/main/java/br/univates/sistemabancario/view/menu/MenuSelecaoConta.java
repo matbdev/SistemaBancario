@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -44,6 +43,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
 
         initComponents();
         addDisabledOption("Selecione um usuário");
+        addDefaultLastOption();
         buttonsPanel.revalidate();
         buttonsPanel.repaint();
         pack();
@@ -59,7 +59,6 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         OpcaoButton ob = new OpcaoButton(text, () -> {});
         ob.setEnabled(false);
         buttonsPanel.addOption(ob, MenuJPanel.DISABLED_COLOR_FOR_BUTTON);
-        add(Box.createVerticalStrut(5));
     }
 
     /**
@@ -117,9 +116,6 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
      * Método principal de exibição do menu
      */
     public void exibir() {
-        buttonsPanel.revalidate();
-        buttonsPanel.repaint();
-        pack();
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -145,7 +141,10 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         titleLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 5, 10));
         painelSuperior.add(titleLabel);
 
-        cbCorrentista.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        JPanel comboBoxPanel = new JPanel(new java.awt.BorderLayout());
+        comboBoxPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        comboBoxPanel.add(cbCorrentista, java.awt.BorderLayout.CENTER);
+        
         cbCorrentista.setAutoscrolls(true);
         cbCorrentista.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -153,7 +152,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
             }
         });
 
-        painelSuperior.add(cbCorrentista);
+        painelSuperior.add(comboBoxPanel);
 
         getContentPane().add(painelSuperior, java.awt.BorderLayout.NORTH);
 
@@ -175,7 +174,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         Pessoa correntista = (Pessoa) this.cbCorrentista.getSelectedItem();
 
         if(correntista == null){
-            addDisabledOption("Selecione um usuáiro");
+            addDisabledOption("Selecione um usuário");
         }else{
             ArrayList<ContaBancaria> cbList = this.cbdao.read(correntista);
 
@@ -183,13 +182,13 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
                 addDisabledOption("Usuário sem contas");
             }else{
                 for (ContaBancaria cb : cbList) {
-                    System.out.println(cb);
-                    addOption(cb.getNumeroContaFormatado(), () -> rodaMenuBanco(cb));
+                    final ContaBancaria contaFinal = cb;
+                    addOption("Conta: " + contaFinal.getNumeroContaFormatado(), () -> rodaMenuBanco(contaFinal));
                 }
             }
-            addDefaultLastOption();
         }
 
+        addDefaultLastOption();
         buttonsPanel.revalidate();
         buttonsPanel.repaint();
         pack();
