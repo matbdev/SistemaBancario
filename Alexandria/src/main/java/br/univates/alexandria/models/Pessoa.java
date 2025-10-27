@@ -49,10 +49,6 @@ public class Pessoa implements Comparable<Pessoa>{
         return getCPF().getCpf();
     }
     
-    public String getLineForSave(){
-        return this.getCpfNumbers() + ";" + this.getNome() + ";" + this.getEndereco();
-    }
-    
     // Setters
     public void setEndereco(String endereco){
         Verificador.verificaVazio(endereco, "Endereço não pode ser vazio.");

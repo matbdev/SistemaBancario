@@ -1,0 +1,3 @@
+db.name=sistemabancario
+db.user=seu_usuario_postgres
+db.password=sua_senha_postgres

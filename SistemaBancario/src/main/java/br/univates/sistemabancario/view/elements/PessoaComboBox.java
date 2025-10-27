@@ -9,8 +9,9 @@ import br.univates.alexandria.models.Pessoa;
 import br.univates.sistemabancario.repository.CorrentistaDAO;
 
 public class PessoaComboBox extends JComboBox<Pessoa> {
-    private final DefaultComboBoxModel<Pessoa> model;
-    private final ArrayList<Pessoa> al;
+    private DefaultComboBoxModel<Pessoa> model;
+    private ArrayList<Pessoa> al;
+    private CorrentistaDAO cdao;
 
     /**
      * Construtor que recebe uma lista com os itens da combobox
@@ -29,6 +30,7 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
      */
     public PessoaComboBox(CorrentistaDAO cdao){
         this.model = new DefaultComboBoxModel<>();
+        this.cdao = cdao;
         this.al = cdao.readAll();
         setModel(model);
         carregarCorrentistas();
@@ -76,5 +78,14 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
      */
     public int getTamanho(){
         return this.al.size();
+    }
+
+    /**
+     * Recarrega a lista do banco de dados.
+     */
+    public void recarregarDoBanco() {
+        if (this.cdao != null) {
+            this.al = this.cdao.readAll();
+        }
     }
 }

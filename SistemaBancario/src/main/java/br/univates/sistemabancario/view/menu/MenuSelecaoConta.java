@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import br.univates.alexandria.models.Pessoa;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Verificador;
 import br.univates.alexandria.view.MenuJPanel;
@@ -18,9 +19,10 @@ import br.univates.sistemabancario.repository.CorrentistaDAO;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.view.elements.PessoaComboBox;
 
-public class MenuSelecaoConta extends javax.swing.JDialog{
+public class MenuSelecaoConta extends javax.swing.JDialog {
     private final CorrentistaDAO cdao;
     private final ContaBancariaDAO cbdao;
+    private final DataBaseConnectionManager db;
 
     // Componentes
     private PessoaComboBox cbCorrentista;
@@ -31,15 +33,18 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
     /**
      * Construtor que recebe o frame pai e se é modal ou não
      * Também recebe um dao de correntista
+     * 
      * @param parent - frame pai
-     * @param modal - se é modal ou não
-     * @param cdao - dao de correntista
-     * @param cbdao - dao de conta bancária
+     * @param modal  - se é modal ou não
+     * @param cdao   - dao de correntista
+     * @param cbdao  - dao de conta bancária
      */
-    public MenuSelecaoConta(Frame parent, boolean modal, CorrentistaDAO cdao, ContaBancariaDAO cbdao){
+    public MenuSelecaoConta(Frame parent, boolean modal, CorrentistaDAO cdao, ContaBancariaDAO cbdao,
+            DataBaseConnectionManager db) {
         super(parent, modal);
         this.cdao = cdao;
         this.cbdao = cbdao;
+        this.db = db;
 
         initComponents();
         addDisabledOption("Selecione um usuário");
@@ -55,23 +60,26 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
     /**
      * Método que adiciona uma opção padrão, desabilitada
      */
-    private void addDisabledOption(String text){
-        OpcaoButton ob = new OpcaoButton(text, () -> {});
+    private void addDisabledOption(String text) {
+        OpcaoButton ob = new OpcaoButton(text, () -> {
+        });
         ob.setEnabled(false);
         buttonsPanel.addOption(ob, MenuJPanel.DISABLED_COLOR_FOR_BUTTON);
     }
 
     /**
      * Define ou atualiza o título do menu.
+     * 
      * @param titulo - titulo a ser setado
      */
     public void setTitulo(String titulo) {
         Verificador.verificaVazio(titulo, "O título não pode estar vazio.");
         setTitle(FormatadorTexto.converteTitleCase(titulo));
     }
-    
+
     /**
      * Define ou atualiza o subtítulo do menu.
+     * 
      * @param subtitulo - subtítulo a ser setado
      */
     public void setSubtitulo(String subtitulo) {
@@ -82,6 +90,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
 
     /**
      * Adiciona uma opção completa ao menu, associando um ícone a um texto.
+     * 
      * @param text O texto descritivo da opção.
      * @param acao A ação executada pela opção
      */
@@ -91,27 +100,27 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
 
     /**
      * Adiciona uma opção completa ao menu, associando um ícone a um texto.
-     * @param text O texto descritivo da opção.
-     * @param acao A ação executada pela opção
+     * 
+     * @param text  O texto descritivo da opção.
+     * @param acao  A ação executada pela opção
      * @param color A cor do botão
      */
     public void addOption(String text, Runnable acao, Color color) {
         buttonsPanel.addOption(new OpcaoButton(text, acao), color);
     }
-    
+
     /**
-    * Adiciona a opção final do menu, que por padrão é a de voltar.
-    * Esta opção não terá um espaçamento após ela.
-    */
-   public void addDefaultLastOption() {
+     * Adiciona a opção final do menu, que por padrão é a de voltar.
+     * Esta opção não terá um espaçamento após ela.
+     */
+    public void addDefaultLastOption() {
         buttonsPanel.addOption(
-            new OpcaoButton(
-                "Voltar à página anterior", 
-                () -> this.dispose()
-            ), MenuJPanel.RED_COLOR_FOR_BUTTON
-        );
-   }
-    
+                new OpcaoButton(
+                        "Voltar à página anterior",
+                        () -> this.dispose()),
+                MenuJPanel.RED_COLOR_FOR_BUTTON);
+    }
+
     /**
      * Método principal de exibição do menu
      */
@@ -133,7 +142,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         painelSuperior.setLayout(new javax.swing.BoxLayout(painelSuperior, javax.swing.BoxLayout.Y_AXIS));
-        
+
         titleLabel.setFont(new java.awt.Font("Segoe UI", 1, 16));
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Menu Title");
@@ -144,7 +153,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         JPanel comboBoxPanel = new JPanel(new java.awt.BorderLayout());
         comboBoxPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10));
         comboBoxPanel.add(cbCorrentista, java.awt.BorderLayout.CENTER);
-        
+
         cbCorrentista.setAutoscrolls(true);
         cbCorrentista.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -158,7 +167,7 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
 
         buttonsPanel.setLayout(new javax.swing.BoxLayout(buttonsPanel, javax.swing.BoxLayout.Y_AXIS));
         buttonsPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 15, 15, 15));
-        
+
         getContentPane().add(buttonsPanel, java.awt.BorderLayout.CENTER);
 
         setMinimumSize(new java.awt.Dimension(300, 200));
@@ -167,20 +176,21 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
     /**
      * Método responsável por realizar uma ação quando o combobox é alterado
      * Carrega as contas apenas do correntista em específico
+     * 
      * @param evt - não utilizado
      */
     private void cbCorrentistaActionPerformed(java.awt.event.ActionEvent evt) {
         buttonsPanel.removeAll();
         Pessoa correntista = (Pessoa) this.cbCorrentista.getSelectedItem();
 
-        if(correntista == null){
+        if (correntista == null) {
             addDisabledOption("Selecione um usuário");
-        }else{
+        } else {
             ArrayList<ContaBancaria> cbList = this.cbdao.read(correntista);
 
-            if(cbList.isEmpty()){
+            if (cbList.isEmpty()) {
                 addDisabledOption("Usuário sem contas");
-            }else{
+            } else {
                 for (ContaBancaria cb : cbList) {
                     final ContaBancaria contaFinal = cb;
                     addOption("Conta: " + contaFinal.getNumeroContaFormatado(), () -> rodaMenuBanco(contaFinal));
@@ -193,15 +203,16 @@ public class MenuSelecaoConta extends javax.swing.JDialog{
         buttonsPanel.repaint();
         pack();
     }
-    
+
     /**
      * Recebe uma conta bancária e abre o MenuBanco para ela.
+     * 
      * @param conta - conta bancária selecionada pelo usuário.
      */
     private void rodaMenuBanco(ContaBancaria conta) {
         if (conta != null) {
             SwingUtilities.invokeLater(() -> {
-                MenuBanco m = new MenuBanco(conta, this.cbdao);
+                MenuBanco m = new MenuBanco(conta, this.cbdao, this.db);
                 m.exibir();
             });
         }

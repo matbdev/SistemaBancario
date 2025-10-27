@@ -1,7 +1,6 @@
 package br.univates.sistemabancario.service;
 
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import br.univates.alexandria.util.FormatadorTexto;
@@ -18,7 +17,6 @@ public class Transacao implements Comparable<Transacao> {
     public static final String DEFAULT_DESC = "default";
     
     // Geração de data
-    private final Calendar c = Calendar.getInstance();
     private final DateFormat df = DateFormat.getDateInstance();
     private final DateFormat hf = DateFormat.getTimeInstance();
     private final Date d;
@@ -28,6 +26,7 @@ public class Transacao implements Comparable<Transacao> {
     private final double valor;
     private final char indicador;
     private final Numero numero;
+    private final double saldo;
     
     /**
      * Construtor que recebe o valor e a descrição
@@ -36,29 +35,11 @@ public class Transacao implements Comparable<Transacao> {
      * @param valor - valor da transação
      * @param desc - descricão da transação
      * @param i - indicador da transação, podendo ser uma das constantes acima
-     */
-    public Transacao(double valor, String desc, char i, Numero numero){
-        char iUpper = Character.toUpperCase(i);
-        
-        if(iUpper != MOV_DEBITO && iUpper != MOV_CREDITO){
-            throw new IllegalArgumentException("Informe uma movimentação válida (MOV_CREDITO ou MOV_DEBITO)");
-        }
-        
-        Verificador.verificaVazio(desc, "Endereço não pode ser vazio.");
-        
-        this.d = c.getTime();
-        this.valor = valor;
-        this.indicador = iUpper;
-        this.numero = numero;
-        
-        if(desc.equals(DEFAULT_DESC)){
-            this.desc = getCorrespondentText() + " de R$" + this.valor + " em " + getDateForDesc();
-        }else{ 
-            this.desc = FormatadorTexto.converteTitleCase(desc);
-        }
-    }
-    
-    public Transacao(double valor, String desc, char i, Date data, Numero numero){
+     * @param saldo - saldo restante na conta após transação
+     * @param data - timestamp da transação
+     * @param numero - numero da conta que realizou a transação
+     */    
+    public Transacao(double valor, double saldo, String desc, char i, Date data, Numero numero){
         char iUpper = Character.toUpperCase(i);
         
         if(iUpper != MOV_DEBITO && iUpper != MOV_CREDITO){
@@ -69,6 +50,7 @@ public class Transacao implements Comparable<Transacao> {
         
         this.d = data;
         this.valor = valor;
+        this.saldo = saldo;
         this.indicador = iUpper;
         this.numero = numero;
         
@@ -99,9 +81,9 @@ public class Transacao implements Comparable<Transacao> {
     public Numero getNumero() {
         return numero;
     }
-    
-    public String getLineForSave(){
-        return getNumero().getNumeroInt() + ";" + getDateTime().getTime() + ";" + getValor() + ";" + getIndicador() + ";" + getDesc();
+
+    public double getSaldo() {
+        return saldo;
     }
     
     /**

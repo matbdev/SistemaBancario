@@ -157,7 +157,7 @@ public class TelaCadastroConta extends javax.swing.JDialog {
      * Método que realiza o cadastro quando o botão é clicado
      * @param evt - não utilizado
      */
-    private void botaoCadastroActionPerformed(java.awt.event.ActionEvent evt) {
+    private void botaoCadastroActionPerformed(@SuppressWarnings("unused") java.awt.event.ActionEvent evt) {
         try {
             Pessoa correntista = (Pessoa) this.cbCorrentista.getSelectedItem();
             if (correntista == null) {

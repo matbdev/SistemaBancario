@@ -1,13 +1,17 @@
 package br.univates.sistemabancario.repository;
         
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import br.univates.alexandria.exceptions.CpfInvalidoException;
+import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.BaseDAO;
-import br.univates.alexandria.util.Arquivo;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.alexandria.util.Messages;
 import br.univates.sistemabancario.exceptions.ContaJaExisteException;
 import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
@@ -21,16 +25,17 @@ import br.univates.sistemabancario.service.Numero;
  * @author mateus.brambilla
  */
 public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
-    private static final Arquivo a = new Arquivo("resources/data/conta_bancaria.dat");
     private final CorrentistaDAO cdao;
     private static final Random random = new Random();
+    private final DataBaseConnectionManager db;
 
     /**
      * Construtor que recebe um cdao via injeção de dependência
      * @param cdao - objeto de CorrentistaDAO já instanciado
      */
-    public ContaBancariaDAO(CorrentistaDAO cdao) {
+    public ContaBancariaDAO(CorrentistaDAO cdao, DataBaseConnectionManager db) {
         this.cdao = cdao;
+        this.db = db;
     }
 
     /**
@@ -46,17 +51,6 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
             }
         }
     }
-
-    /**
-     * Verifica se o número já existe na base de dados
-     * @param n - inteiro representando o número
-     * @throws NumeroContaInvalidoException - caso o número já exista
-     */
-    private void verificaNumeroExiste(int n) throws NumeroContaInvalidoException {
-        if (this.read(n) != null) {
-            throw new NumeroContaInvalidoException("O número de conta " + n + " já existe na base de dados");
-        }
-    }
     
     /**
      * Método que retorna todos os registros
@@ -64,67 +58,53 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      */
     @Override
     public ArrayList<ContaBancaria> readAll() {
-        ArrayList<Pessoa> todosCorrentistas = cdao.readAll();
         ArrayList<ContaBancaria> cbList = new ArrayList<>();
-        
-        if (a.abrirLeitura()) {
-            try { // garante que o finally será executado
-                String linha;
-                while ((linha = a.lerLinha()) != null) {
-                    try {
-                        String[] cbLine = linha.split(";");
-                        
-                        if (cbLine.length < 4) { // proteção contra linha mal formatada
-                            Messages.errorMessage("Registro de conta mal formatado no arquivo. Linha ignorada.");
-                            continue;
-                        }
 
-                        String cpfArquivo = cbLine[0];
-                        Pessoa pEncontrada = null;
-                        for (Pessoa p : todosCorrentistas) {
-                            if (p.getCpfNumbers().equals(cpfArquivo)) {
-                                pEncontrada = p;
-                                break;
-                            }
-                        }
+        try{
+            ResultSet rs = this.db.runQuerySQL("SELECT * FROM conta;");
 
-                        if (pEncontrada == null) {
-                            Messages.errorMessage("Conta bancária órfã encontrada. CPF: " + cpfArquivo);
-                            continue;
-                        }
-                        
-                        int numero = Integer.parseInt(cbLine[1]);
-                        double saldo = Double.parseDouble(cbLine[2]);
-                        double limite = Double.parseDouble(cbLine[3]);
-                        String tipoConta = cbLine[4];
-                        
-                        ContaBancaria cb;
-                        if (tipoConta.equals("ContaBancariaEspecial")) {
-                            cb = new ContaBancariaEspecial(pEncontrada, limite, 0, numero);
+            if (rs.isBeforeFirst()){
+                rs.next();
 
-                            if (saldo > 0) {
-                                cb.depositaValor(saldo);
-                            } else if (saldo < 0) {
-                                cb.sacarValor(Math.abs(saldo));
-                            }
-                        } else {
-                            cb = new ContaBancaria(pEncontrada, saldo, numero);
-                        }
-                        
-                        cbList.add(cb);
-                        
-                    } catch (NumberFormatException e) {
-                        Messages.errorMessage("Erro de formatação de número em uma linha do arquivo de contas. Linha ignorada.");
-                    } catch (SaldoInvalidoException | NumeroContaInvalidoException e) {
-                        Messages.errorMessage(e.getMessage());
+                while (!rs.isAfterLast()){
+                    int numeroConta = rs.getInt("numero_conta");
+                    String tipoContaStr = rs.getString("tipo_conta");
+                    char tipoConta = tipoContaStr.charAt(0);
+                    double limiteConta = rs.getDouble("limite_conta");
+                    String cpfCorrentista = rs.getString("cpf_correntista");
+                    double saldo = rs.getDouble("saldo");
+
+                    ContaBancaria cb;
+                    CPF cpf = new CPF(cpfCorrentista);
+                    Pessoa pEncontrada = this.cdao.read(cpf);
+
+                    if (pEncontrada == null) {
+                        Messages.errorMessage("Conta bancária órfã encontrada. CPF: " + cpf.getCpfFormatado());
+                        continue;
                     }
-                }
-            } finally {
-                a.fecharArquivo();
-            }
-        }
 
-        Collections.sort(cbList);
+                    if (tipoConta == 'E') {
+                        cb = new ContaBancariaEspecial(pEncontrada, limiteConta, 0, numeroConta);
+                        if (saldo > 0) {
+                            cb.depositaValor(saldo);
+                        } else if (saldo < 0) {
+                            cb.sacarValor(Math.abs(saldo));
+                        }
+                    } else {
+                        cb = new ContaBancaria(pEncontrada, saldo, numeroConta);
+                    }
+                        
+                    cbList.add(cb);
+                    rs.next();
+                }
+            }
+
+            db.closeConnection();
+            Collections.sort(cbList);
+            
+        } catch (DataBaseException | CpfInvalidoException | SaldoInvalidoException | SQLException | NumeroContaInvalidoException e){
+            Messages.errorMessage(e);
+        }
         return cbList;
     }
     
@@ -135,37 +115,20 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      */
     @Override
     public void create(ContaBancaria cb) throws ContaJaExisteException, NumeroContaInvalidoException {
-        // Se a conta foi criada com um número específico, verifica se ele já existe
-        if (cb.getNumeroConta().isDefinidoPeloUsuario()) {
-            verificaNumeroExiste(cb.getNumeroContaInt());
-        } else {
-            int numeroUnico = gerarNumeroUnico();
-            cb.getNumeroConta().setNumero(numeroUnico); // Atribui o número gerado ao objeto da conta
+        if (!cb.getNumeroConta().isDefinidoPeloUsuario()) {
+            cb.getNumeroConta().setNumero(gerarNumeroUnico()); // Atribui o número gerado ao objeto da conta
         }
 
-        ArrayList<ContaBancaria> cbList = readAll();
-        if (cbList.contains(cb)) {
-            throw new ContaJaExisteException("A conta de número " + cb.getNumeroContaFormatado() + " já existe.");
-        }
-        
-        cbList.add(cb);
-        saveAll(cbList);
-    }
-    
-    /**
-     * Método privado que salva a lista inteira de contas no arquivo,
-     * sobrescrevendo o conteúdo anterior.
-     * @param cbList A lista completa a ser salva.
-     */
-    private void saveAll(ArrayList<ContaBancaria> cbList) {
-        if (a.abrirEscrita()) {
-            try {
-                for (ContaBancaria conta : cbList) {
-                    a.escreverLinha(conta.getLineForSave());
-                }
-            } finally {
-                a.fecharArquivo();
-            }
+        String tipoContaStr;
+
+        if(cb.getTipoConta().equals("ContaBancaria")) tipoContaStr = "N";
+        else tipoContaStr = "E";
+
+        try{
+            this.db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
+            cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(), cb.getSaldo());
+        } catch (DataBaseException e){
+            Messages.errorMessage(e);
         }
     }
     
@@ -176,40 +139,14 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      */
     @Override
     public ContaBancaria read(Numero numero) {
-        if (a.abrirLeitura()) {
-            try {
-                String linha;
-                while ((linha = a.lerLinha()) != null) {
-                    try {
-                        String[] cbLine = linha.split(";");
-                        int num = Integer.parseInt(cbLine[1]);
+        ArrayList<ContaBancaria> cbList = readAll();
 
-                        if (cbLine.length >= 2 && num == numero.getNumeroInt()) {
-                            Pessoa pEncontrada = cdao.read(new CPF(cbLine[0]));
-                            if (pEncontrada != null) {
-                                double saldo = Double.parseDouble(cbLine[2]);
-                                double limite = Double.parseDouble(cbLine[3]);
-                                String tipoConta = cbLine[4];
-
-                                ContaBancaria cb;
-                                if (tipoConta.equals("ContaBancariaEspecial")) {
-                                    cb = new ContaBancariaEspecial(pEncontrada, limite, saldo, num);
-                                } else {
-                                    cb = new ContaBancaria(pEncontrada, saldo, num);
-                                }
-
-                                return cb; 
-                            }
-                        }
-                    } catch (Exception e) { 
-                        /* Ignora linha mal formatada ou inválida */
-                    }
-                }
-            } finally {
-                a.fecharArquivo();
+        for (ContaBancaria cb : cbList) {
+            if(cb.getNumeroContaInt() == numero.getNumeroInt()){
+                return cb;
             }
         }
-        return null; // Não encontrou
+        return null;
     }
 
     /**
@@ -218,45 +155,16 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      * @return lista de contas do correntista
      */
     public ArrayList<ContaBancaria> read(Pessoa p) {
-        ArrayList<ContaBancaria> cbList = new ArrayList<>();
+        ArrayList<ContaBancaria> cbList = readAll();
+        ArrayList<ContaBancaria> cbListEncontrada = new ArrayList<>();
 
-        if (a.abrirLeitura()) {
-            try {
-                String linha;
-                while ((linha = a.lerLinha()) != null) {
-                    try {
-                        String[] cbLine = linha.split(";");
-                        Pessoa pEncontrada = cdao.read(new CPF(cbLine[0]));
-
-                        if (pEncontrada.equals(p)) {
-                            int numero = Integer.parseInt(cbLine[1]);
-                            double saldo = Double.parseDouble(cbLine[2]);
-                            double limite = Double.parseDouble(cbLine[3]);
-                            String tipoConta = cbLine[4];
-                        
-                            ContaBancaria cb;
-                            if (tipoConta.equals("ContaBancariaEspecial")) {
-                                cb = new ContaBancariaEspecial(pEncontrada, limite, 0, numero);
-                                if (saldo > 0) {
-                                    cb.depositaValor(saldo);
-                                } else if (saldo < 0) {
-                                    cb.sacarValor(Math.abs(saldo));
-                                }
-                            } else {
-                                cb = new ContaBancaria(pEncontrada, saldo, numero);
-                            }
-                        
-                            cbList.add(cb);
-                        }
-                    } catch (Exception e) { 
-                        /* Ignora linha mal formatada ou inválida */
-                    }
-                }
-            } finally {
-                a.fecharArquivo();
+        for (ContaBancaria cb : cbList) {
+            if(cb.getPessoa().equals(p)){
+                cbListEncontrada.add(cb);
             }
         }
-        return cbList;
+
+        return cbListEncontrada;
     }
     
     /**
@@ -284,15 +192,11 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
      * @param cb - objeto de ContaBancaria, que vem deste próprio dao
      */
     public void update(ContaBancaria cb){
-        ArrayList<ContaBancaria> cbList = readAll();
-        
-        int pIndex = cbList.indexOf(cb);
-
-        if (pIndex != -1) {
-            cbList.set(pIndex, cb);
-            saveAll(cbList);
-        } else {
-            Messages.errorMessage("Erro: A conta " + cb.getNumeroContaFormatado() + " não foi encontrada para atualização.");
+        try{
+            this.db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
+            cb.getSaldo(), cb.getNumeroContaInt());
+        } catch (DataBaseException e){
+            Messages.errorMessage(e);
         }
     }
 }
