@@ -76,16 +76,38 @@ public class TransacaoDAO {
      * @return transações realizadas pela conta
      */
     public ArrayList<Transacao> read(Numero n) {
-        ArrayList<Transacao> tList = readAll();
-        ArrayList<Transacao> transacoesDaConta = new ArrayList<>();
+        ArrayList<Transacao> tList = new ArrayList<>();
 
-        for (Transacao t : tList) {
-            if (n.equals(t.getNumero())) {
-                transacoesDaConta.add(t);
+        try {
+            ResultSet rs = this.db.runPreparedQuerySQL("SELECT * FROM transacao where numero_conta = ?;",
+                    n.getNumeroInt());
+
+            if (rs.isBeforeFirst()) {
+                rs.next();
+
+                while (!rs.isAfterLast()) {
+                    Date d = rs.getDate("data_transacao");
+
+                    String descricao = rs.getString("descricao");
+                    String indicadorStr = rs.getString("tipo");
+                    char indicador = indicadorStr.charAt(0);
+
+                    double valor = rs.getDouble("valor");
+                    double saldo = rs.getDouble("saldo");
+
+                    tList.add(new Transacao(valor, saldo, descricao, indicador, d, n));
+                    rs.next();
+                }
             }
+
+            db.closeConnection();
+            Collections.sort(tList);
+
+        } catch (DataBaseException | SQLException e) {
+            Messages.errorMessage(e);
         }
 
-        return transacoesDaConta;
+        return tList;
     }
 
     /**
@@ -102,10 +124,9 @@ public class TransacaoDAO {
             String dataStr = sf.format(t.getDateTime());
 
             this.db.runPreparedSQL(
-                "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
-                numeroContaInt, dataStr, t.getDesc(), t.getValor(), indicadorStr, t.getSaldo()
-            );
-            
+                    "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
+                    numeroContaInt, dataStr, t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
+
         } catch (DataBaseException e) {
             Messages.errorMessage(e);
         }

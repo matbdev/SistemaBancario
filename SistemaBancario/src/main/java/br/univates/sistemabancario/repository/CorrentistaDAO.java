@@ -67,14 +67,24 @@ public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
      */
     @Override
     public Pessoa read(CPF cpf) {
-        ArrayList<Pessoa> pList = readAll();
+        Pessoa pessoaEncontrada = null;
+        try {
+            ResultSet rs = this.db.runPreparedQuerySQL("SELECT * FROM correntista where cpf_correntista = ?;",
+                    cpf.getCpf());
 
-        for (Pessoa p : pList) {
-            if (p.getCpfNumbers().equals(cpf.getCpf())) {
-                return p;
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                String nome = rs.getString("nome");
+                String endereco = rs.getString("endereco");
+                pessoaEncontrada = new Pessoa(cpf, nome, endereco);
             }
+
+            db.closeConnection();
+        } catch (DataBaseException | SQLException | CpfInvalidoException e) {
+            Messages.errorMessage(e);
         }
-        return null;
+
+        return pessoaEncontrada;
     }
 
     /*

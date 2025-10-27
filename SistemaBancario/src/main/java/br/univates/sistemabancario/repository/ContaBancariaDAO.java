@@ -1,5 +1,5 @@
 package br.univates.sistemabancario.repository;
-        
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,15 +22,17 @@ import br.univates.sistemabancario.service.Numero;
 
 /**
  * Classe com a lógica de gravação (inexistente por enquanto)
+ * 
  * @author mateus.brambilla
  */
-public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
+public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero> {
     private final CorrentistaDAO cdao;
     private static final Random random = new Random();
     private final DataBaseConnectionManager db;
 
     /**
      * Construtor que recebe um cdao via injeção de dependência
+     * 
      * @param cdao - objeto de CorrentistaDAO já instanciado
      */
     public ContaBancariaDAO(CorrentistaDAO cdao, DataBaseConnectionManager db) {
@@ -40,6 +42,7 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
 
     /**
      * Gera um número de conta único que ainda não existe no DAO.
+     * 
      * @return um número inteiro único.
      * @throws NumeroContaInvalidoException - caso o número da conta for inválido
      */
@@ -51,22 +54,23 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
             }
         }
     }
-    
+
     /**
      * Método que retorna todos os registros
+     * 
      * @return lista com objetos ContaBancaria
      */
     @Override
     public ArrayList<ContaBancaria> readAll() {
         ArrayList<ContaBancaria> cbList = new ArrayList<>();
 
-        try{
+        try {
             ResultSet rs = this.db.runQuerySQL("SELECT * FROM conta;");
 
-            if (rs.isBeforeFirst()){
+            if (rs.isBeforeFirst()) {
                 rs.next();
 
-                while (!rs.isAfterLast()){
+                while (!rs.isAfterLast()) {
                     int numeroConta = rs.getInt("numero_conta");
                     String tipoContaStr = rs.getString("tipo_conta");
                     char tipoConta = tipoContaStr.charAt(0);
@@ -93,7 +97,7 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
                     } else {
                         cb = new ContaBancaria(pEncontrada, saldo, numeroConta);
                     }
-                        
+
                     cbList.add(cb);
                     rs.next();
                 }
@@ -101,15 +105,17 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
 
             db.closeConnection();
             Collections.sort(cbList);
-            
-        } catch (DataBaseException | CpfInvalidoException | SaldoInvalidoException | SQLException | NumeroContaInvalidoException e){
+
+        } catch (DataBaseException | CpfInvalidoException | SaldoInvalidoException | SQLException
+                | NumeroContaInvalidoException e) {
             Messages.errorMessage(e);
         }
         return cbList;
     }
-    
+
     /**
      * Método responsável por adicionar um objeto na lista
+     * 
      * @param cb - ContaBancaria a ser adicionada
      * @throws ContaJaExisteException - caso a conta já exista
      */
@@ -121,54 +127,125 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
 
         String tipoContaStr;
 
-        if(cb.getTipoConta().equals("ContaBancaria")) tipoContaStr = "N";
-        else tipoContaStr = "E";
+        if (cb.getTipoConta().equals("ContaBancaria"))
+            tipoContaStr = "N";
+        else
+            tipoContaStr = "E";
 
-        try{
+        try {
             this.db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
-            cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(), cb.getSaldo());
-        } catch (DataBaseException e){
+                    cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
+                    cb.getSaldo());
+        } catch (DataBaseException e) {
             Messages.errorMessage(e);
         }
     }
-    
+
     /**
      * Método que retorna uma ContaBancaria com base no número da conta
+     * 
      * @param numero - objeto Numero instanciado, da conta
      * @return a conta com o número igual
      */
     @Override
     public ContaBancaria read(Numero numero) {
-        ArrayList<ContaBancaria> cbList = readAll();
+        ContaBancaria contaEncontrada = null;
 
-        for (ContaBancaria cb : cbList) {
-            if(cb.getNumeroContaInt() == numero.getNumeroInt()){
-                return cb;
+        try {
+            ResultSet rs = this.db.runPreparedQuerySQL("SELECT * FROM conta where numero_conta = ?;",
+                    numero.getNumeroInt());
+
+            if (rs.isBeforeFirst()) {
+                rs.next();
+
+                int numeroConta = numero.getNumeroInt();
+                String tipoContaStr = rs.getString("tipo_conta");
+                char tipoConta = tipoContaStr.charAt(0);
+                double limiteConta = rs.getDouble("limite_conta");
+                String cpfCorrentista = rs.getString("cpf_correntista");
+                double saldo = rs.getDouble("saldo");
+
+                CPF cpf = new CPF(cpfCorrentista);
+                Pessoa pEncontrada = this.cdao.read(cpf);
+
+                if (pEncontrada == null) {
+                    Messages.errorMessage("Conta bancária órfã encontrada. CPF: " + cpf.getCpfFormatado());
+                } else {
+                    if (tipoConta == 'E') {
+                        contaEncontrada = new ContaBancariaEspecial(pEncontrada, limiteConta, 0, numeroConta);
+                        if (saldo > 0) {
+                            contaEncontrada.depositaValor(saldo);
+                        } else if (saldo < 0) {
+                            contaEncontrada.sacarValor(Math.abs(saldo));
+                        }
+                    } else {
+                        contaEncontrada = new ContaBancaria(pEncontrada, saldo, numeroConta);
+                    }
+                }
             }
+
+            db.closeConnection();
+
+        } catch (DataBaseException | CpfInvalidoException | SaldoInvalidoException | SQLException
+                | NumeroContaInvalidoException e) {
+            Messages.errorMessage(e);
         }
-        return null;
+        return contaEncontrada;
     }
 
     /**
      * Método que retorna uma ContaBancaria com base no correntista dela
+     * 
      * @param p - objeto de Pessoa instanciado
      * @return lista de contas do correntista
      */
     public ArrayList<ContaBancaria> read(Pessoa p) {
-        ArrayList<ContaBancaria> cbList = readAll();
-        ArrayList<ContaBancaria> cbListEncontrada = new ArrayList<>();
+        ArrayList<ContaBancaria> cbList = new ArrayList<>();
 
-        for (ContaBancaria cb : cbList) {
-            if(cb.getPessoa().equals(p)){
-                cbListEncontrada.add(cb);
+        try {
+            ResultSet rs = this.db.runPreparedQuerySQL("SELECT * FROM conta where cpf_correntista = ?;",
+                    p.getCpfNumbers());
+
+            if (rs.isBeforeFirst()) {
+                rs.next();
+
+                while (!rs.isAfterLast()) {
+                    int numeroConta = rs.getInt("numero_conta");
+                    String tipoContaStr = rs.getString("tipo_conta");
+                    char tipoConta = tipoContaStr.charAt(0);
+                    double limiteConta = rs.getDouble("limite_conta");
+                    double saldo = rs.getDouble("saldo");
+
+                    ContaBancaria cb;
+                    if (tipoConta == 'E') {
+                        cb = new ContaBancariaEspecial(p, limiteConta, 0, numeroConta);
+                        if (saldo > 0) {
+                            cb.depositaValor(saldo);
+                        } else if (saldo < 0) {
+                            cb.sacarValor(Math.abs(saldo));
+                        }
+                    } else {
+                        cb = new ContaBancaria(p, saldo, numeroConta);
+                    }
+
+                    cbList.add(cb);
+                    rs.next();
+                }
             }
-        }
 
-        return cbListEncontrada;
+            db.closeConnection();
+            Collections.sort(cbList);
+
+        } catch (DataBaseException | SaldoInvalidoException | SQLException
+                | NumeroContaInvalidoException e) {
+            Messages.errorMessage(e);
+        }
+        return cbList;
     }
-    
+
     /**
      * Método que retorna uma ContaBancaria com base no número da conta
+     * 
      * @param numero - int que representa número da conta
      * @return a conta com o número igual
      * @throws NumeroContaInvalidoException - caso o número for inválido
@@ -177,25 +254,28 @@ public class ContaBancariaDAO implements BaseDAO<ContaBancaria, Numero>{
         Numero numeroObj = new Numero(numero);
         return read(numeroObj);
     }
-    
+
     /**
-     * Método que retorna uma ContaBancaria com base no número da conta (de outra contabancária)
+     * Método que retorna uma ContaBancaria com base no número da conta (de outra
+     * contabancária)
+     * 
      * @param cb2 - outra conta bancária
      * @return a conta com o número igual
      */
-    public ContaBancaria read(ContaBancaria cb2){
+    public ContaBancaria read(ContaBancaria cb2) {
         return read(cb2.getNumeroConta());
     }
-    
+
     /**
      * Método que recebe uma conta e saldo e atualiza o cadastro da conta
+     * 
      * @param cb - objeto de ContaBancaria, que vem deste próprio dao
      */
-    public void update(ContaBancaria cb){
-        try{
+    public void update(ContaBancaria cb) {
+        try {
             this.db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
-            cb.getSaldo(), cb.getNumeroContaInt());
-        } catch (DataBaseException e){
+                    cb.getSaldo(), cb.getNumeroContaInt());
+        } catch (DataBaseException e) {
             Messages.errorMessage(e);
         }
     }
