@@ -9,7 +9,6 @@ import br.univates.alexandria.util.Messages;
 import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.ContaBancaria;
-import br.univates.sistemabancario.service.Transacao;
 import br.univates.sistemabancario.view.tela.TelaPrincipal;
 
 /**
@@ -25,7 +24,7 @@ public class App {
             // Injestão de dependências
             IDao<Pessoa, CPF> correntistaDAO = DAOFactory.getCorrentistaDAO();
             IDao<ContaBancaria, Integer> contaBancariaDAO = DAOFactory.getContaBancariaDAO();
-            IDaoTransacao<Transacao, Integer> transacaoDAO = DAOFactory.getTransacaoDAO();
+            IDaoTransacao transacaoDAO = DAOFactory.getTransacaoDAO();
 
             TelaPrincipal tp = new TelaPrincipal(correntistaDAO, contaBancariaDAO, transacaoDAO);
             tp.iniciarMenuContas();

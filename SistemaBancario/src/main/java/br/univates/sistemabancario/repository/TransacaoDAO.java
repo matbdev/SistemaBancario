@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository.postgresql;
+package br.univates.sistemabancario.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,41 +9,35 @@ import java.util.Date;
 import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotFoundException;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
-import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.Numero;
 import br.univates.sistemabancario.service.Transacao;
 
-public class TransacaoDAOPostgreSQL implements IDaoTransacao<Transacao, Integer> {
+public class TransacaoDAO implements IDaoTransacao {
 
     /**
-     * {@inheritDoc}
-     * Propaga DataBaseException (erro de conexão) do initializeDatabase().
+     * Cria um registro de transação usando uma conexão de banco de dados fornecida.
+     * Não fecha a conexão, permitindo o uso em transações.
+     *
+     * @param t  - A Transacao a ser criada
+     * @param db - O gerenciador de conexão já aberto
      */
     @Override
-    public void create(Transacao t) throws DataBaseException {
-        DataBaseConnectionManager db = DAOFactory.getDataBaseConnectionManager();
-
-        try {
-            String indicadorStr = String.valueOf(t.getIndicador());
-            int numeroContaInt = t.getNumero().getNumeroInt();
-
-            db.runPreparedSQL(
-                    "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
-                    numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
-
-        } finally {
-            if (db != null) {
-                db.closeConnection();
-            }
+    public void create(Transacao t, DataBaseConnectionManager db) throws DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
         }
+        
+        String indicadorStr = String.valueOf(t.getIndicador());
+        int numeroContaInt = t.getNumero().getNumeroInt();
+
+        db.runPreparedSQL(
+                "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
+                numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
     }
 
     /**
      * {@inheritDoc}
-     * Propaga DataBaseException (erro de conexão) do initializeDatabase() e
-     * runQuerySQL().
-     * Mapeia erros de dados (SQL, NumeroInvalido) para RecordNotReady.
      */
     @Override
     public ArrayList<Transacao> read(Integer number) throws RecordNotFoundException, DataBaseException {

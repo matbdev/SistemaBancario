@@ -11,11 +11,7 @@ import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.App;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
-import br.univates.sistemabancario.repository.postgresql.ContaBancariaDAOPostgreSQL;
-import br.univates.sistemabancario.repository.postgresql.CorrentistaDAOPostgreSQL;
-import br.univates.sistemabancario.repository.postgresql.TransacaoDAOPostgreSQL;
 import br.univates.sistemabancario.service.ContaBancaria;
-import br.univates.sistemabancario.service.Transacao;
 
 /**
  * Fábrica para criar instâncias de DAOs.
@@ -30,7 +26,7 @@ public class DAOFactory {
      * @return - instância de CorrentistaDAO
      */
     public static IDao<Pessoa, CPF> getCorrentistaDAO() {
-        return new CorrentistaDAOPostgreSQL();
+        return new CorrentistaDAO();
     }
 
     /**
@@ -39,7 +35,7 @@ public class DAOFactory {
      * @return - instância de ContaBancariaDAO
      */
     public static IDao<ContaBancaria, Integer> getContaBancariaDAO() {
-        return new ContaBancariaDAOPostgreSQL();
+        return new ContaBancariaDAO();
     }
 
     /**
@@ -47,8 +43,8 @@ public class DAOFactory {
      * 
      * @return - instância de TransacaoDAO
      */
-    public static IDaoTransacao<Transacao, Integer> getTransacaoDAO() {
-        return new TransacaoDAOPostgreSQL();
+    public static IDaoTransacao getTransacaoDAO() {
+        return new TransacaoDAO();
     }
 
     /**

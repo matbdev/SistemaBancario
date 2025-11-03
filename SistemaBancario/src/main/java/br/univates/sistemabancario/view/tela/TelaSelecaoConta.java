@@ -17,6 +17,7 @@ import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Inputs;
 import br.univates.alexandria.util.Messages;
@@ -25,6 +26,7 @@ import br.univates.alexandria.view.MenuDialog;
 import br.univates.alexandria.view.MenuJPanel;
 import br.univates.alexandria.view.OpcaoButton;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.Transacao;
@@ -33,7 +35,7 @@ import br.univates.sistemabancario.view.elements.PessoaComboBox;
 public class TelaSelecaoConta extends javax.swing.JDialog {
     private final IDao<Pessoa, CPF> cdao;
     private final IDao<ContaBancaria, Integer> cbdao;
-    private final IDaoTransacao<Transacao, Integer> tdao;
+    private final IDaoTransacao tdao;
 
     // Componentes
     private PessoaComboBox cbCorrentista;
@@ -53,7 +55,7 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
     public TelaSelecaoConta(Frame parent, boolean modal,
             IDao<Pessoa, CPF> cdao,
             IDao<ContaBancaria, Integer> cbdao,
-            IDaoTransacao<Transacao, Integer> tdao) {
+            IDaoTransacao tdao) {
         super(parent, modal);
 
         this.cdao = cdao;
@@ -254,7 +256,7 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
     public class MenuBanco extends MenuDialog {
         private final ContaBancaria cb;
         private final Calendar c = Calendar.getInstance();
-        private final IDaoTransacao<Transacao, Integer> tdao;
+        private final IDaoTransacao tdao;
         private final IDao<ContaBancaria, Integer> cbdao;
 
         /**
@@ -262,7 +264,7 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
          * 
          * @param cb - conta bancária já instanciada
          */
-        public MenuBanco(ContaBancaria cb, IDao<ContaBancaria, Integer> cbdao, IDaoTransacao<Transacao, Integer> tdao) {
+        public MenuBanco(ContaBancaria cb, IDao<ContaBancaria, Integer> cbdao, IDaoTransacao tdao) {
             super(null, true);
 
             this.cb = cb;
@@ -275,7 +277,7 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
         }
 
         /**
-         * Método auxilair que adiciona as opções ao menu
+         * Método auxiliar que adiciona as opções ao menu
          */
         private void adicionarOpcoes() {
             addOption("Depositar valor", () -> depositarValor());
@@ -289,28 +291,54 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
          * Método que realiza um depósito de modo totalmente autônomo
          */
         private void depositarValor() {
+            DataBaseConnectionManager db = null; // Conexão única para a transação
             try {
                 double dQtde = Inputs.Double(
                         "Infome a quantidade a ser depositada",
                         "DEPÓSITO");
 
+                // Necessário para não fechar o banco de dados
+                db = DAOFactory.getDataBaseConnectionManager();
+                db.runSQL("BEGIN TRANSACTION;");
+
                 this.cb.depositaValor(dQtde);
-                this.tdao.create(
-                        new Transacao(
-                                dQtde,
-                                this.cb.getSaldo(),
-                                Transacao.DEFAULT_DESC,
-                                Transacao.MOV_CREDITO,
-                                c.getTime(),
-                                this.cb.getNumeroConta()));
-                this.cbdao.update(this.cb); // atualiza conta no arquivo
+                Transacao t = new Transacao(
+                        dQtde,
+                        this.cb.getSaldo(),
+                        Transacao.DEFAULT_DESC,
+                        Transacao.MOV_CREDITO,
+                        c.getTime(),
+                        this.cb.getNumeroConta());
+
+                this.tdao.create(t, db);
+                this.cbdao.update(this.cb, db); // Casting direto
+
+                // Em caso de sucesso
+                db.runSQL("COMMIT;");
 
                 verificarStatus();
 
             } catch (SaldoInvalidoException | DataBaseException | DuplicatedKeyException | RecordNotFoundException e) {
+                // Em caso de erro
+                if (db != null) {
+                    try {
+                        db.runSQL("ROLLBACK;");
+                    } catch (DataBaseException ex) {
+                        Messages.errorMessage(ex.getMessage(), "Erro crítico ao tentar reverter transação.");
+                    }
+                }
                 Messages.errorMessage(e);
             } catch (NullInputException e) {
                 Messages.infoMessage("Cancelando operação...");
+            } finally {
+                // Fecha a conexão
+                if (db != null) {
+                    try{
+                        db.closeConnection();
+                    } catch (DataBaseException ex) {
+                        Messages.errorMessage(ex.getMessage(), "Erro ao fechar banco de dados.");
+                    }
+                }
             }
         }
 
@@ -318,29 +346,54 @@ public class TelaSelecaoConta extends javax.swing.JDialog {
          * Método que realiza um saque de modo totalmente autônomo
          */
         private void sacarValor() {
+            DataBaseConnectionManager db = null; // Conexão única para a transação
             try {
                 double dQtde = Inputs.Double(
                         "Informe a quantidade a ser sacada",
                         "SAQUE");
 
-                this.cb.sacarValor(dQtde);
+                // Necessário para não fechar o banco de dados
+                db = DAOFactory.getDataBaseConnectionManager();
+                db.runSQL("BEGIN TRANSACTION;");
 
-                this.tdao.create(
-                        new Transacao(
-                                dQtde,
-                                this.cb.getSaldo(),
-                                Transacao.DEFAULT_DESC,
-                                Transacao.MOV_DEBITO,
-                                c.getTime(),
-                                this.cb.getNumeroConta()));
-                this.cbdao.update(this.cb);
+                this.cb.sacarValor(dQtde);
+                Transacao t = new Transacao(
+                        dQtde,
+                        this.cb.getSaldo(),
+                        Transacao.DEFAULT_DESC,
+                        Transacao.MOV_DEBITO,
+                        c.getTime(),
+                        this.cb.getNumeroConta());
+
+                this.tdao.create(t, db);
+                this.cbdao.update(this.cb, db);
+
+                // Em caso de sucesso
+                db.runSQL("COMMIT;");
 
                 verificarStatus();
 
             } catch (SaldoInvalidoException | DataBaseException | DuplicatedKeyException | RecordNotFoundException e) {
+                // Em caso de erro
+                if (db != null) {
+                    try {
+                        db.runSQL("ROLLBACK;");
+                    } catch (DataBaseException ex) {
+                        Messages.errorMessage(ex.getMessage(), "Erro crítico ao tentar reverter transação.");
+                    }
+                }
                 Messages.errorMessage(e);
             } catch (NullInputException e) {
                 Messages.infoMessage("Cancelando operação...");
+            } finally {
+                // Fecha a conexão
+                if (db != null) {
+                    try{
+                        db.closeConnection();
+                    } catch (DataBaseException ex){
+                        Messages.errorMessage(ex.getMessage(), "Erro ao fechar banco de dados.");
+                    }
+                }
             }
         }
 

@@ -14,7 +14,6 @@ import br.univates.alexandria.util.Messages;
 import br.univates.alexandria.view.MenuDialog;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.ContaBancaria;
-import br.univates.sistemabancario.service.Transacao;
 
 public class TelaGerenciamentoContas {
     private JFrame parentFrame;
@@ -30,13 +29,13 @@ public class TelaGerenciamentoContas {
     public class MenuContasBancarias extends MenuDialog {
         private final IDao<Pessoa, CPF> cdao;
         private final IDao<ContaBancaria, Integer> cbdao;
-        private final IDaoTransacao<Transacao, Integer> tdao;
+        private final IDaoTransacao tdao;
         private final JFrame parentFrame;
 
         // Construtor
         public MenuContasBancarias(JFrame parent, IDao<Pessoa, CPF> cdao,
                 IDao<ContaBancaria, Integer> cbdao,
-                IDaoTransacao<Transacao, Integer> tdao) {
+                IDaoTransacao tdao) {
             super(parent, true);
             this.parentFrame = parent;
             this.cdao = cdao;

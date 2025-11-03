@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository.postgresql;
+package br.univates.sistemabancario.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,29 +15,39 @@ import br.univates.alexandria.interfaces.IFilter;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
-import br.univates.sistemabancario.repository.DAOFactory;
 
-public class CorrentistaDAOPostgreSQL implements IDao<Pessoa, CPF> {
+public class CorrentistaDAO implements IDao<Pessoa, CPF> {
 
-    public CorrentistaDAOPostgreSQL() {
+    public CorrentistaDAO() {
+    }
+
+    /**
+     * {@inheritedDoc}
+     */
+    @Override
+    public void create(Pessoa p, DataBaseConnectionManager db) throws DuplicatedKeyException, DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+        }
+        try {
+            db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
+                    p.getCpfNumbers(), p.getNome(), p.getEndereco());
+        } catch (DataBaseException e) {
+            throw new DuplicatedKeyException();
+        }
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * Este método gerencia sua própria conexão e a fecha após o uso.
      */
     @Override
     public void create(Pessoa p) throws DuplicatedKeyException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-
-            try {
-                db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
-                        p.getCpfNumbers(), p.getNome(), p.getEndereco());
-            } catch (DataBaseException e) {
-                throw new DuplicatedKeyException();
-            }
-
+            this.create(p, db);
         } finally {
             // Fecha a conexão
             if (db != null) {
@@ -138,17 +148,25 @@ public class CorrentistaDAOPostgreSQL implements IDao<Pessoa, CPF> {
     /**
      * {@inheritDoc}
      */
+    public void update(Pessoa p, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+        }
+        db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
+                    p.getNome(), p.getEndereco(), p.getCpfNumbers());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Este método gerencia sua própria conexão e a fecha após o uso.
+     */
     @Override
     public void update(Pessoa p) throws RecordNotFoundException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            // Abre a conexão
             db = DAOFactory.getDataBaseConnectionManager();
-
-            // Propaga DataBaseException (erro de conexão)
-            db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
-                    p.getNome(), p.getEndereco(), p.getCpfNumbers());
-
+            this.update(p, db);
         } finally {
             // Fecha a conexão
             if (db != null) {

@@ -10,7 +10,6 @@ import br.univates.alexandria.util.Messages;
 import br.univates.alexandria.view.MenuDialog;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.ContaBancaria;
-import br.univates.sistemabancario.service.Transacao;
 
 /**
  * Tela que serve para garantir estrutura da arquitetura do projeto
@@ -20,11 +19,11 @@ import br.univates.sistemabancario.service.Transacao;
 public class TelaPrincipal extends JFrame {
     private final IDao<Pessoa, CPF> cdao;
     private final IDao<ContaBancaria, Integer> cbdao;
-    private final IDaoTransacao<Transacao, Integer> tdao;
+    private final IDaoTransacao tdao;
 
     public TelaPrincipal(IDao<Pessoa, CPF> cdao,
             IDao<ContaBancaria, Integer> cbdao,
-            IDaoTransacao<Transacao, Integer> tdao) {
+            IDaoTransacao tdao) {
         this.cdao = cdao;
         this.cbdao = cbdao;
         this.tdao = tdao;
@@ -50,7 +49,7 @@ public class TelaPrincipal extends JFrame {
     public class MenuContasCorrentistas extends MenuDialog {
         private final IDao<Pessoa, CPF> cdao;
         private final IDao<ContaBancaria, Integer> cbdao;
-        private final IDaoTransacao<Transacao, Integer> tdao;
+        private final IDaoTransacao tdao;
         private final JFrame parentFrame;
 
         /**
@@ -59,7 +58,7 @@ public class TelaPrincipal extends JFrame {
          */
         public MenuContasCorrentistas(JFrame parent, IDao<Pessoa, CPF> cdao,
                 IDao<ContaBancaria, Integer> cbdao,
-                IDaoTransacao<Transacao, Integer> tdao) {
+                IDaoTransacao tdao) {
             super(parent, true); // Agora é modal em relação ao JFrame principal
             this.parentFrame = parent;
             this.cdao = cdao;

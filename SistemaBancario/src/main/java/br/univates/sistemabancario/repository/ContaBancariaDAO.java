@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository.postgresql;
+package br.univates.sistemabancario.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,36 +16,46 @@ import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
-import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.ContaBancariaEspecial;
 
-public class ContaBancariaDAOPostgreSQL implements IDao<ContaBancaria, Integer> {
+public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
 
-    public ContaBancariaDAOPostgreSQL() {
+    public ContaBancariaDAO() {
+    }
+
+    /**
+     * {@inheritedDoc}
+     */
+    @Override
+    public void create(ContaBancaria cb, DataBaseConnectionManager db) throws DuplicatedKeyException, DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+        }
+        try {
+            String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
+            db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
+                    cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
+                    cb.getSaldo());
+
+        } catch (DataBaseException e) {
+            throw new DuplicatedKeyException();
+        }
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * Este método gerencia sua própria conexão e a fecha após o uso.
      */
     @Override
     public void create(ContaBancaria cb) throws DuplicatedKeyException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-
-            try {
-                String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
-                db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
-                        cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
-                        cb.getSaldo());
-
-            } catch (DataBaseException e) {
-                throw new DuplicatedKeyException();
-            }
-
+            this.create(cb, db);
         } finally {
-            // Fecha a conexão do INSERT
+            // Fecha a conexão
             if (db != null) {
                 db.closeConnection();
             }
@@ -117,7 +127,7 @@ public class ContaBancariaDAOPostgreSQL implements IDao<ContaBancaria, Integer> 
     public ArrayList<ContaBancaria> readAll() throws RecordNotReady, DataBaseException {
         ArrayList<ContaBancaria> cbList = new ArrayList<>();
         DataBaseConnectionManager db = null;
-        CorrentistaDAOPostgreSQL cdao = new CorrentistaDAOPostgreSQL();
+        CorrentistaDAO cdao = new CorrentistaDAO();
 
         try {
             db = DAOFactory.getDataBaseConnectionManager();
@@ -184,15 +194,25 @@ public class ContaBancariaDAOPostgreSQL implements IDao<ContaBancaria, Integer> 
     /**
      * {@inheritDoc}
      */
+    public void update(ContaBancaria cb, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+        }
+        db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
+                cb.getSaldo(), cb.getNumeroContaInt());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Este método gerencia sua própria conexão e a fecha após o uso.
+     */
     @Override
     public void update(ContaBancaria cb) throws RecordNotFoundException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-
-            db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
-                    cb.getSaldo(), cb.getNumeroContaInt());
-
+            this.update(cb, db);
         } finally {
             // Fecha a conexão
             if (db != null) {
