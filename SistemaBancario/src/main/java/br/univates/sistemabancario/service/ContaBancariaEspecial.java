@@ -1,7 +1,6 @@
 package br.univates.sistemabancario.service;
 
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
 
 /**
@@ -12,7 +11,7 @@ import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
  */
 public class ContaBancariaEspecial extends ContaBancaria {
     public ContaBancariaEspecial(Pessoa p, double limite, double saldo)
-            throws SaldoInvalidoException, NumeroContaInvalidoException {
+            throws SaldoInvalidoException {
         super(p, saldo);
         setLimite(limite);
     }

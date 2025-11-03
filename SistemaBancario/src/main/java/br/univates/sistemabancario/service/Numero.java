@@ -1,7 +1,5 @@
 package br.univates.sistemabancario.service;
 
-import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
-
 /**
  * Classe que representa um número da conta
  * @author mateus.brambilla
@@ -9,17 +7,8 @@ import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
 public class Numero {
     private final String num;
     private final int intNum;
-    private static int nContaCounter = 0; 
 
-    public Numero() throws NumeroContaInvalidoException {
-        int novoNumero = ++nContaCounter;
-        this.intNum = novoNumero;
-        this.num = formatarString(this.intNum);
-    }
-
-    /**
-     * Construtor para quando o número da conta já é conhecido
-     */
+    // Construtor
     public Numero(int n) {
         this.intNum = n;
         this.num = formatarString(n);

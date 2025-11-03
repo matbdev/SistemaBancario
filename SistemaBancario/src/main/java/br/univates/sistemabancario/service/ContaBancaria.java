@@ -1,7 +1,6 @@
 package br.univates.sistemabancario.service;
 
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.exceptions.NumeroContaInvalidoException;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
 
 /**
@@ -13,14 +12,13 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
     private final Pessoa pessoa;
     private double saldo = 0;
     private double limite = 0;
-    private final Numero nConta;
+    private Numero nConta;
 
     // Constructor overload
-    public ContaBancaria(Pessoa p, double saldo) throws SaldoInvalidoException, NumeroContaInvalidoException {
+    public ContaBancaria(Pessoa p, double saldo) throws SaldoInvalidoException {
         verificaSaldo(saldo, "O saldo é menor que 0, informe uma quantia válida.");
         this.pessoa = p;
         this.saldo = saldo;
-        this.nConta = new Numero();
     }
 
     public ContaBancaria(Pessoa p, double saldo, int numeroConta) throws SaldoInvalidoException {
@@ -28,6 +26,18 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
         this.pessoa = p;
         this.saldo = saldo;
         this.nConta = new Numero(numeroConta);
+    }
+
+    /**
+     * Permite que o DAO defina o número da conta antes de salvá-la.
+     * @param n - novo número da conta.
+     */
+    public void setNumeroConta(Numero n) {
+        // Impede troca de número
+        if (this.nConta != null) {
+            throw new IllegalStateException("O número da conta já foi definido.");
+        }
+        this.nConta = n;
     }
 
     /**
@@ -103,6 +113,10 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
     }
 
     public Numero getNumeroConta() {
+        if (this.nConta == null) {
+            // Caso tentar usar a conta antes de salvá-la no banco
+            throw new IllegalStateException("A conta ainda não foi registrada e não possui um número.");
+        }
         return this.nConta;
     }
 

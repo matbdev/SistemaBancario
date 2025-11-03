@@ -1,5 +1,13 @@
+# Não necessários
 */target/
-*.dat
 *.form
+
+# Configurações vscode
 .vscode
+
+# Dados sensíveis
 config.properties
+
+# Banco de dados
+*.db
+*.dat

@@ -18,6 +18,7 @@ import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.ContaBancariaEspecial;
+import br.univates.sistemabancario.service.Numero;
 
 public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
 
@@ -44,6 +45,24 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
     }
 
     /**
+     * Busca o maior número de conta existente no banco de dados.
+     * @param db - conexão de banco de dados a ser usada.
+     * @return - maior número de conta, ou 0 se a tabela estiver vazia.
+     * @throws DataBaseException - erro ao consultar o banco.
+     */
+    private int getMaxNumeroConta(DataBaseConnectionManager db) throws DataBaseException {
+        int maxNumero = 0;
+        try (ResultSet rs = db.runQuerySQL("SELECT MAX(numero_conta) AS max_num FROM conta;")) {
+            if (rs.next()) {
+                maxNumero = rs.getInt("max_num");
+            }
+        } catch (SQLException e) {
+            // Em caso de não houver registros
+        }
+        return maxNumero;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * Este método gerencia sua própria conexão e a fecha após o uso.
@@ -53,6 +72,12 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
+
+            // Define o número da conta como o maior cadastrado + 1
+            int maxNum = this.getMaxNumeroConta(db);
+            Numero novoNumero = new Numero(maxNum + 1);
+            cb.setNumeroConta(novoNumero); // Esse método só pode ser chamado uma vez, quando não há número
+
             this.create(cb, db);
         } finally {
             // Fecha a conexão
