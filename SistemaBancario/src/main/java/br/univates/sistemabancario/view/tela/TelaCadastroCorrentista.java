@@ -1,7 +1,11 @@
 package br.univates.sistemabancario.view.tela;
 
+import br.univates.alexandria.exceptions.CpfInvalidoException;
+import br.univates.alexandria.exceptions.DataBaseException;
+import br.univates.alexandria.exceptions.DuplicatedKeyException;
+import br.univates.alexandria.interfaces.IDao;
+import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.repository.CorrentistaDAO;
 
 import java.awt.Color;
 
@@ -12,10 +16,11 @@ import javax.swing.JTextField;
 
 /**
  * Dialog responsável pelo cadastro de correntistas
+ * 
  * @author mateus.brambilla
  */
 public class TelaCadastroCorrentista extends javax.swing.JDialog {
-    private final CorrentistaDAO cdao;
+    private final IDao<Pessoa, CPF> cdao;
 
     // Componentes
     private JButton botaoCadastro;
@@ -30,10 +35,11 @@ public class TelaCadastroCorrentista extends javax.swing.JDialog {
 
     /**
      * Creates new form FrameCadastroCorrentista
+     * 
      * @param parent - um JFrame
-     * @param cdao - persistência para correntista
+     * @param cdao   - persistência para correntista
      */
-    public TelaCadastroCorrentista(JFrame parent, CorrentistaDAO cdao) {
+    public TelaCadastroCorrentista(JFrame parent, IDao<Pessoa, CPF> cdao) {
         super(parent, "Cadastro de Correntista", true); // <- true = modal
         this.cdao = cdao;
         initComponents();
@@ -88,79 +94,109 @@ public class TelaCadastroCorrentista extends javax.swing.JDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(labelTitulo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelNome, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(labelEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(labelSuccessError, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(botaoCadastro))
-                                .addComponent(labelCpf, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(tfCpf)
-                                .addComponent(tfEndereco)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(tfNome, javax.swing.GroupLayout.Alignment.LEADING))
-                .addGap(18, 18, 18))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(labelTitulo, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(labelNome, javax.swing.GroupLayout.Alignment.LEADING,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout
+                                                .createSequentialGroup()
+                                                .addGroup(layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(labelEndereco,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 370,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(layout
+                                                                .createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                        false)
+                                                                .addGroup(layout.createSequentialGroup()
+                                                                        .addComponent(labelSuccessError,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                272,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(18, 18, 18)
+                                                                        .addComponent(botaoCadastro))
+                                                                .addComponent(labelCpf,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        Short.MAX_VALUE)
+                                                                .addComponent(tfCpf)
+                                                                .addComponent(tfEndereco)))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(tfNome, javax.swing.GroupLayout.Alignment.LEADING))
+                                .addGap(18, 18, 18)));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(labelTitulo)
-                .addGap(12, 12, 12)
-                .addComponent(labelNome)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tfNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelCpf)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tfCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelEndereco)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tfEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(labelSuccessError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(15, 15, 15))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                        .addComponent(botaoCadastro)
-                        .addGap(24, 24, 24))))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(labelTitulo)
+                                .addGap(12, 12, 12)
+                                .addComponent(labelNome)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfNome, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelCpf)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfCpf, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelEndereco)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfEndereco, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(labelSuccessError, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(15, 15, 15))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout
+                                                .createSequentialGroup()
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29,
+                                                        Short.MAX_VALUE)
+                                                .addComponent(botaoCadastro)
+                                                .addGap(24, 24, 24)))));
 
         pack();
     }
 
     /**
      * Método que realiza o cadastro de um correntista quando o botão é pressionado
+     * 
      * @param evt - não utilizado
      */
     private void botaoCadastroActionPerformed(java.awt.event.ActionEvent evt) {
-        try{
+        try {
             String nome = this.tfNome.getText();
             String cpf = this.tfCpf.getText();
             String endereco = this.tfEndereco.getText();
-            
+
             Pessoa pessoa = new Pessoa(cpf, nome, endereco);
             cdao.create(pessoa);
-            
+
             this.labelSuccessError.setText("Correntista adicionado com sucesso!");
             this.labelSuccessError.setForeground(Color.green);
-            
+
             this.tfNome.setText("");
             this.tfCpf.setText("");
             this.tfEndereco.setText("");
-        }catch(Exception e){
-            // Html para quebra de linha
+        } catch (CpfInvalidoException e) {
+            this.labelSuccessError.setText("<html>Erro: O CPF informado é inválido.</html>");
+            this.labelSuccessError.setForeground(Color.red);
+        } catch (DuplicatedKeyException e) {
+            this.labelSuccessError.setText("<html>Erro: Já existe um correntista com este CPF.</html>");
+            this.labelSuccessError.setForeground(Color.red);
+        } catch (DataBaseException e) {
+            this.labelSuccessError.setText("<html>Erro de banco de dados: " + e.getMessage() + "</html>");
+            this.labelSuccessError.setForeground(Color.red);
+        } catch (Exception e) {
             this.labelSuccessError.setText("<html>Erro: " + e.getMessage() + "</html>");
             this.labelSuccessError.setForeground(Color.red);
         }

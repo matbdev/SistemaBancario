@@ -1,16 +1,15 @@
 package br.univates.sistemabancario;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import br.univates.alexandria.exceptions.DataBaseException;
-import br.univates.alexandria.repository.DataBaseConnectionManager;
+import br.univates.alexandria.interfaces.IDao;
+import br.univates.alexandria.models.CPF;
+import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.util.Messages;
-import br.univates.sistemabancario.repository.ContaBancariaDAO;
-import br.univates.sistemabancario.repository.CorrentistaDAO;
+import br.univates.sistemabancario.repository.DAOFactory;
+import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
+import br.univates.sistemabancario.service.ContaBancaria;
+import br.univates.sistemabancario.service.Transacao;
 import br.univates.sistemabancario.view.tela.TelaPrincipal;
 
 /**
@@ -23,30 +22,15 @@ public class App {
         FlatDarkLaf.setup(); // Configuração e aplicação do FlatLaf
 
         try {
-            // Ocultando informações do banco de dados
-            Properties props = new Properties();
-            try (InputStream input = App.class.getClassLoader().getResourceAsStream("config.properties")) {
-                if (input == null) {
-                    throw new IOException("Arquivo 'config.properties' não encontrado");
-                }
-                props.load(input);
-            }
-            
-            DataBaseConnectionManager dbcm = new DataBaseConnectionManager(
-                    DataBaseConnectionManager.POSTGRESQL,
-                    props.getProperty("db.name"),
-                    props.getProperty("db.user"),     
-                    props.getProperty("db.password"));
-            dbcm.connectionTest();
+            // Injestão de dependências
+            IDao<Pessoa, CPF> correntistaDAO = DAOFactory.getCorrentistaDAO();
+            IDao<ContaBancaria, Integer> contaBancariaDAO = DAOFactory.getContaBancariaDAO();
+            IDaoTransacao<Transacao, Integer> transacaoDAO = DAOFactory.getTransacaoDAO();
 
-            // Ingestão de dependências
-            CorrentistaDAO cdao = new CorrentistaDAO(dbcm);
-            ContaBancariaDAO cbdao = new ContaBancariaDAO(cdao, dbcm);
-
-            TelaPrincipal tp = new TelaPrincipal();
-            tp.iniciarMenuContas(cdao, cbdao, dbcm);
-        } catch (DataBaseException | IOException e) {
-            Messages.errorMessage(e);
+            TelaPrincipal tp = new TelaPrincipal(correntistaDAO, contaBancariaDAO, transacaoDAO);
+            tp.iniciarMenuContas();
+        } catch (Exception e) {
+            Messages.errorMessage(e.getMessage(), "Erro fatal ao iniciar a aplicação");
             System.exit(0);
         }
     }

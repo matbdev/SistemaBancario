@@ -22,9 +22,8 @@ public class Pessoa implements Comparable<Pessoa> {
      * @param cpf      - cpf do usuário (é passado para classe cpf)
      * @param nome     - nome do usuário
      * @param endereco - endereco do usuário
-     * @throws CpfInvalidoException - em caso de cpf inválido
      */
-    public Pessoa(CPF cpf, String nome, String endereco) throws CpfInvalidoException {
+    public Pessoa(CPF cpf, String nome, String endereco) {
         this.cpf = cpf;
         setNome(nome);
         setEndereco(endereco);

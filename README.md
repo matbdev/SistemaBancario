@@ -115,9 +115,6 @@ A aplicação iniciará, exibindo o menu principal no console.
 
 ## 📈 Evoluções e Melhorias Futuras
 
-- **Modernizar a Persistência:** Substituir sistema de arquivos por:
-  - Serialização JSON (`Gson`, `Jackson`)
-  - Banco de dados embutido (`SQLite` com JDBC)
 - **Introduzir Camada de Serviço:** Formalizar entre View e DAOs para melhor separação
 - **Utilizar Enums:** Converter constantes `char` (como `MOV_DEBITO`, `MOV_CREDITO`) para Enums
 

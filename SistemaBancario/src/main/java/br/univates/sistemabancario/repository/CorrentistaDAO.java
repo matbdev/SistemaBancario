@@ -7,159 +7,174 @@ import java.util.Collections;
 
 import br.univates.alexandria.exceptions.CpfInvalidoException;
 import br.univates.alexandria.exceptions.DataBaseException;
+import br.univates.alexandria.exceptions.DuplicatedKeyException;
+import br.univates.alexandria.exceptions.RecordNotFoundException;
+import br.univates.alexandria.exceptions.RecordNotReady;
+import br.univates.alexandria.interfaces.IDao;
+import br.univates.alexandria.interfaces.IFilter;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
-import br.univates.alexandria.repository.BaseDAO;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
-import br.univates.alexandria.util.Messages;
 
-/**
- * Classe que lida com a persistência para cadastro de correntista
- * 
- * @author mateus.brambilla
- */
-public class CorrentistaDAO implements BaseDAO<Pessoa, CPF> {
-    private final DataBaseConnectionManager db;
+public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
 
-    public CorrentistaDAO(DataBaseConnectionManager db) {
-        this.db = db;
+    public CorrentistaDAO() {
     }
 
     /**
-     * Método que retorna todos os valores
-     * 
-     * @return arraylist dos valores
+     * {@inheritDoc}
      */
     @Override
-    public ArrayList<Pessoa> readAll() {
-        ArrayList<Pessoa> pList = new ArrayList<>();
+    public void create(Pessoa p) throws DuplicatedKeyException, DataBaseException {
+        DataBaseConnectionManager db = null;
         try {
-            ResultSet rs = this.db.runQuerySQL("SELECT * FROM correntista;");
+            db = getDatabaseConnection();
 
-            if (rs.isBeforeFirst()) {
-                rs.next();
-
-                while (!rs.isAfterLast()) {
-                    String cpf = rs.getString("cpf_correntista");
-                    String nome = rs.getString("nome");
-                    String endereco = rs.getString("endereco");
-
-                    pList.add(new Pessoa(cpf, nome, endereco));
-                    rs.next();
-                }
+            try {
+                db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
+                        p.getCpfNumbers(), p.getNome(), p.getEndereco());
+            } catch (DataBaseException e) {
+                throw new DuplicatedKeyException();
             }
 
-            db.closeConnection();
-            Collections.sort(pList);
+        } finally {
+            // Fecha a conexão
+            if (db != null) {
+                db.closeConnection();
+            }
+        }
+    }
 
-        } catch (DataBaseException | SQLException | CpfInvalidoException e) {
-            Messages.errorMessage(e);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Pessoa read(CPF cpf) throws RecordNotFoundException, DataBaseException {
+        Pessoa pessoaEncontrada = null;
+        DataBaseConnectionManager db = null;
+
+        try {
+            db = getDatabaseConnection();
+
+            try (ResultSet rs = db.runPreparedQuerySQL("SELECT * FROM correntista where cpf_correntista = ?;",
+                    cpf.getCpf())) {
+
+                if (rs.isBeforeFirst()) {
+                    rs.next();
+                    String nome = rs.getString("nome");
+                    String endereco = rs.getString("endereco");
+                    pessoaEncontrada = new Pessoa(cpf, nome, endereco);
+                }
+            } catch (SQLException e) {
+                throw new RecordNotFoundException();
+            }
+
+        } finally {
+            if (db != null) {
+                db.closeConnection();
+            }
         }
 
+        if (pessoaEncontrada == null) {
+            throw new RecordNotFoundException();
+        }
+        return pessoaEncontrada;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ArrayList<Pessoa> readAll() throws RecordNotReady, DataBaseException {
+        ArrayList<Pessoa> pList = new ArrayList<>();
+        DataBaseConnectionManager db = null;
+
+        try {
+            db = getDatabaseConnection();
+
+            try (ResultSet rs = db.runQuerySQL("SELECT * FROM correntista;")) {
+
+                if (rs.isBeforeFirst()) {
+                    rs.next();
+                    while (!rs.isAfterLast()) {
+                        String cpf = rs.getString("cpf_correntista");
+                        String nome = rs.getString("nome");
+                        String endereco = rs.getString("endereco");
+
+                        pList.add(new Pessoa(cpf, nome, endereco));
+                        rs.next();
+                    }
+                }
+                Collections.sort(pList);
+            } catch (CpfInvalidoException | SQLException e) {
+                throw new RecordNotReady();
+            }
+
+        } finally {
+            // Fecha a conexão
+            if (db != null) {
+                db.closeConnection();
+            }
+        }
         return pList;
     }
 
     /**
-     * Método que retorna um objeto específico com base no cpf
-     * 
-     * @param cpf - um objeto da classe CPF
-     * @return a pessoa encontrada ou nulo
+     * {@inheritDoc}
      */
     @Override
-    public Pessoa read(CPF cpf) {
-        Pessoa pessoaEncontrada = null;
-        try {
-            ResultSet rs = this.db.runPreparedQuerySQL("SELECT * FROM correntista where cpf_correntista = ?;",
-                    cpf.getCpf());
-
-            if (rs.isBeforeFirst()) {
-                rs.next();
-                String nome = rs.getString("nome");
-                String endereco = rs.getString("endereco");
-                pessoaEncontrada = new Pessoa(cpf, nome, endereco);
+    public ArrayList<Pessoa> readAll(IFilter<Pessoa> filtro) throws RecordNotReady, DataBaseException {
+        ArrayList<Pessoa> listaCompleta = this.readAll();
+        ArrayList<Pessoa> listaFiltrada = new ArrayList<>();
+        for (Pessoa p : listaCompleta) {
+            if (filtro.isAccept(p)) {
+                listaFiltrada.add(p);
             }
-
-            db.closeConnection();
-        } catch (DataBaseException | SQLException | CpfInvalidoException e) {
-            Messages.errorMessage(e);
         }
-
-        return pessoaEncontrada;
-    }
-
-    /*
-     * Método que retorna uma pessoa se já houver uma no banco de dados
-     * com o mesmo CPF
-     * 
-     * @param pessoa - um objeto da classe Pessoa
-     * 
-     * @return a pessoa encontrada ou nulo
-     */
-    public Pessoa read(Pessoa pessoa) {
-        return read(pessoa.getCPF()); // Reutiliza o método acima
-    }
-
-    /*
-     * Método que retorna uma pessoa se já houver uma no banco de dados
-     * com o mesmo CPF
-     * 
-     * @param pessoa - um objeto da classe Pessoa
-     * 
-     * @return a pessoa encontrada ou nulo
-     */
-    public Pessoa read(String cpf) {
-        try {
-            return read(new CPF(cpf)); // Reutiliza o método acima
-        } catch (CpfInvalidoException e) {
-            Messages.errorMessage(e);
-        }
-        return null;
+        return listaFiltrada;
     }
 
     /**
-     * Método responsável por adicionar um objeto no arraylist
-     * 
-     * @param p - pessoa a ser adicionada
+     * {@inheritDoc}
      */
     @Override
-    public void create(Pessoa p) {
+    public void update(Pessoa p) throws RecordNotFoundException, DataBaseException {
+        DataBaseConnectionManager db = null;
         try {
-            this.db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
-                    p.getCpfNumbers(), p.getNome(), p.getEndereco());
-        } catch (DataBaseException e) {
-            Messages.errorMessage(e);
-        }
-    }
+            // Abre a conexão
+            db = getDatabaseConnection();
 
-    /**
-     * Método que recebe uma pessoa, nome e endereço e atualiza o cadastro do
-     * usuário.
-     * Retorna a instância da pessoa atualizada.
-     * 
-     * @param p        - objeto de pessoa original
-     * @param nome     - nome (novo ou corrente) da pessoa
-     * @param endereco - endereço (novo ou corrente) da pessoa
-     */
-    public void update(Pessoa p) {
-        try {
-            this.db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
+            // Propaga DataBaseException (erro de conexão)
+            db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
                     p.getNome(), p.getEndereco(), p.getCpfNumbers());
-        } catch (DataBaseException e) {
-            Messages.errorMessage(e);
+
+        } finally {
+            // Fecha a conexão
+            if (db != null) {
+                db.closeConnection();
+            }
         }
     }
 
     /**
-     * Método que recebe um objeto e o delta
-     * 
-     * @param p - objeto de pessoa
+     * {@inheritDoc}
      */
-    public void delete(Pessoa p) {
+    @Override
+    public void delete(Pessoa p) throws RecordNotFoundException, DataBaseException {
+        DataBaseConnectionManager db = null;
         try {
-            this.db.runPreparedSQL("DELETE FROM correntista WHERE cpf_correntista = ?",
+            // Abre a conexão
+            db = getDatabaseConnection();
+
+            // Propaga DataBaseException (erro de conexão)
+            db.runPreparedSQL("DELETE FROM correntista WHERE cpf_correntista = ?",
                     p.getCpfNumbers());
-        } catch (DataBaseException e) {
-            Messages.errorMessage(e);
+
+        } finally {
+            // Fecha a conexão
+            if (db != null) {
+                db.closeConnection();
+            }
         }
     }
 }
