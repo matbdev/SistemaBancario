@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository;
+package br.univates.sistemabancario.repository.postgresql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,11 +9,12 @@ import java.util.Date;
 import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotFoundException;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
+import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.service.Numero;
 import br.univates.sistemabancario.service.Transacao;
 
-public class TransacaoDAO extends BaseDAO implements IDaoTransacao<Transacao, Integer> {
+public class TransacaoDAOPostgreSQL implements IDaoTransacao<Transacao, Integer> {
 
     /**
      * {@inheritDoc}
@@ -21,7 +22,7 @@ public class TransacaoDAO extends BaseDAO implements IDaoTransacao<Transacao, In
      */
     @Override
     public void create(Transacao t) throws DataBaseException {
-        DataBaseConnectionManager db = getDatabaseConnection();
+        DataBaseConnectionManager db = DAOFactory.getDataBaseConnectionManager();
 
         try {
             String indicadorStr = String.valueOf(t.getIndicador());
@@ -46,7 +47,7 @@ public class TransacaoDAO extends BaseDAO implements IDaoTransacao<Transacao, In
      */
     @Override
     public ArrayList<Transacao> read(Integer number) throws RecordNotFoundException, DataBaseException {
-        DataBaseConnectionManager db = getDatabaseConnection();
+        DataBaseConnectionManager db = DAOFactory.getDataBaseConnectionManager();
 
         ArrayList<Transacao> tList = new ArrayList<>();
 

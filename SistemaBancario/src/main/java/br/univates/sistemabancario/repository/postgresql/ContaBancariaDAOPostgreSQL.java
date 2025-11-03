@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository;
+package br.univates.sistemabancario.repository.postgresql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,12 +16,13 @@ import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.service.ContaBancaria;
 import br.univates.sistemabancario.service.ContaBancariaEspecial;
 
-public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Integer> {
+public class ContaBancariaDAOPostgreSQL implements IDao<ContaBancaria, Integer> {
 
-    public ContaBancariaDAO() {
+    public ContaBancariaDAOPostgreSQL() {
     }
 
     /**
@@ -31,7 +32,7 @@ public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Int
     public void create(ContaBancaria cb) throws DuplicatedKeyException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try {
                 String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
@@ -58,10 +59,10 @@ public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Int
     public ContaBancaria read(Integer numero) throws RecordNotFoundException, DataBaseException {
         ContaBancaria contaEncontrada = null;
         DataBaseConnectionManager db = null;
-        CorrentistaDAO cdao = new CorrentistaDAO();
+        IDao<Pessoa, CPF> cdao = DAOFactory.getCorrentistaDAO();
 
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try (ResultSet rs = db.runPreparedQuerySQL("SELECT * FROM conta where numero_conta = ?;",
                     numero)) {
@@ -116,10 +117,10 @@ public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Int
     public ArrayList<ContaBancaria> readAll() throws RecordNotReady, DataBaseException {
         ArrayList<ContaBancaria> cbList = new ArrayList<>();
         DataBaseConnectionManager db = null;
-        CorrentistaDAO cdao = new CorrentistaDAO();
+        CorrentistaDAOPostgreSQL cdao = new CorrentistaDAOPostgreSQL();
 
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try (ResultSet rs = db.runQuerySQL("SELECT * FROM conta;")) {
 
@@ -187,7 +188,7 @@ public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Int
     public void update(ContaBancaria cb) throws RecordNotFoundException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
                     cb.getSaldo(), cb.getNumeroContaInt());
@@ -207,7 +208,7 @@ public class ContaBancariaDAO extends BaseDAO implements IDao<ContaBancaria, Int
     public void delete(ContaBancaria cb) throws RecordNotFoundException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             db.runPreparedSQL("DELETE FROM conta WHERE numero_conta = ?",
                     cb.getNumeroContaInt());

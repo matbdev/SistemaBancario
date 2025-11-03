@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.repository;
+package br.univates.sistemabancario.repository.postgresql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,10 +15,11 @@ import br.univates.alexandria.interfaces.IFilter;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
+import br.univates.sistemabancario.repository.DAOFactory;
 
-public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
+public class CorrentistaDAOPostgreSQL implements IDao<Pessoa, CPF> {
 
-    public CorrentistaDAO() {
+    public CorrentistaDAOPostgreSQL() {
     }
 
     /**
@@ -28,7 +29,7 @@ public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
     public void create(Pessoa p) throws DuplicatedKeyException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try {
                 db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
@@ -54,7 +55,7 @@ public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
 
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try (ResultSet rs = db.runPreparedQuerySQL("SELECT * FROM correntista where cpf_correntista = ?;",
                     cpf.getCpf())) {
@@ -90,7 +91,7 @@ public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
 
         try {
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             try (ResultSet rs = db.runQuerySQL("SELECT * FROM correntista;")) {
 
@@ -142,7 +143,7 @@ public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
         try {
             // Abre a conexão
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             // Propaga DataBaseException (erro de conexão)
             db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
@@ -164,7 +165,7 @@ public class CorrentistaDAO extends BaseDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
         try {
             // Abre a conexão
-            db = getDatabaseConnection();
+            db = DAOFactory.getDataBaseConnectionManager();
 
             // Propaga DataBaseException (erro de conexão)
             db.runPreparedSQL("DELETE FROM correntista WHERE cpf_correntista = ?",
