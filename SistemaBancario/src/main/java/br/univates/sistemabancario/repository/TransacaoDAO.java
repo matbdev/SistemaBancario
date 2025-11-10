@@ -16,34 +16,21 @@ import br.univates.sistemabancario.model.Transacao;
 public class TransacaoDAO implements IDaoTransacao {
 
     /**
-     * Cria um registro de transação usando uma conexão de banco de dados fornecida.
-     * Não fecha a conexão, permitindo o uso em transações.
-     *
-     * @param t  - A Transacao a ser criada
+     * {@inheritedDoc}
      */
     @Override
-    public void create(Transacao t) throws DataBaseException {
-        DataBaseConnectionManager db = null;
-        
-        try {
-            db = DAOFactory.getDataBaseConnectionManager();
-
-            if (db == null) {
-                throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-            }
-
-            String indicadorStr = String.valueOf(t.getIndicador());
-            int numeroContaInt = t.getNumero().getNumeroInt();
-
-            db.runPreparedSQL(
-                    "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
-                    numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
-
-        } finally {
-            if (db != null) {
-                db.closeConnection();
-            }
+    public void create(Transacao t, DataBaseConnectionManager db) throws DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
         }
+
+        String indicadorStr = String.valueOf(t.getIndicador());
+        int numeroContaInt = t.getNumero().getNumeroInt();
+
+        db.runPreparedSQL(
+            "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
+            numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo()
+        );
     }
 
     /**
@@ -59,7 +46,7 @@ public class TransacaoDAO implements IDaoTransacao {
             if (rs.isBeforeFirst()) {
                 rs.next();
                 while (!rs.isAfterLast()) {
-                    Date d = rs.getDate("data_transacao");
+                    Date d = rs.getTimestamp("data_transacao");
                     String descricao = rs.getString("descricao");
                     char indicador = rs.getString("tipo").charAt(0);
                     double valor = rs.getDouble("valor");

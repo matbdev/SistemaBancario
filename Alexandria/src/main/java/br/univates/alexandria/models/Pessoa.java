@@ -46,14 +46,6 @@ public class Pessoa implements Comparable<Pessoa> {
         return this.cpf;
     }
 
-    public String getCpfFormatado() {
-        return getCPF().getCpfFormatado();
-    }
-
-    public String getCpfNumbers() {
-        return getCPF().getCpf();
-    }
-
     // Setters
     public void setEndereco(String endereco) {
         Verificador.verificaVazio(endereco, "Endereço não pode ser vazio.");
@@ -72,7 +64,7 @@ public class Pessoa implements Comparable<Pessoa> {
      */
     @Override
     public String toString() {
-        return (this.getCpfFormatado() + " - " + this.getNome());
+        return (this.getCPF().getCpfFormatado() + " - " + this.getNome());
     }
 
     /**
@@ -98,7 +90,7 @@ public class Pessoa implements Comparable<Pessoa> {
         boolean r = false;
         if (obj != null && obj instanceof Pessoa) {
             Pessoa outraPessoa = (Pessoa) obj;
-            r = Objects.equals(this.getCpfFormatado(), outraPessoa.getCpfFormatado());
+            r = Objects.equals(this.getCPF().getCpfFormatado(), outraPessoa.getCPF().getCpfFormatado());
         }
         return r;
     }
@@ -112,6 +104,6 @@ public class Pessoa implements Comparable<Pessoa> {
      */
     @Override
     public int hashCode() {
-        return this.getCpfFormatado().hashCode();
+        return this.getCPF().getCpfFormatado().hashCode();
     }
 }

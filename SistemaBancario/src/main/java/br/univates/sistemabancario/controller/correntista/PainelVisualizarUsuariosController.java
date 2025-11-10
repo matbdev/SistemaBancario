@@ -23,13 +23,11 @@ public class PainelVisualizarUsuariosController {
     
     /**
      * Busca os dados no DAO e os carrega na JTable da View.
+     * @throws DataBaseException - erro de conexão com o banco de dados
+     * @throws RecordNotReady - erro de atributo no registro
      */
-    public void carregarDados() {
-        try {
-            PessoaTableModel tableModel = new PessoaTableModel(cdao.readAll());
-            view.getTable().setModel(tableModel); 
-        } catch (DataBaseException | RecordNotReady ex) {
-            view.exibirErro("Erro ao carregar usuários: " + ex.getMessage());
-        }
+    public void carregarDados() throws DataBaseException, RecordNotReady{
+        PessoaTableModel tableModel = new PessoaTableModel(cdao.readAll());
+        view.getTable().setModel(tableModel); 
     }
 }

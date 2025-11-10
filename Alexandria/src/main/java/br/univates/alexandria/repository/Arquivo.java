@@ -1,4 +1,4 @@
-package br.univates.alexandria.util;
+package br.univates.alexandria.repository;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

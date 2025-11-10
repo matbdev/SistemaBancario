@@ -74,7 +74,7 @@ public class PainelVisualizarExtratoController {
         ContaBancaria contaSelecionada = painel.getCbContaBancaria().getSelecionado();
         
         if (contaSelecionada != null){
-            int numeroContaInt = contaSelecionada.getNumeroContaInt();
+            int numeroContaInt = contaSelecionada.getNumeroConta().getNumeroInt();
             
             try {
                 ExtratoTableModel tableModel = new ExtratoTableModel(tdao.read(numeroContaInt));

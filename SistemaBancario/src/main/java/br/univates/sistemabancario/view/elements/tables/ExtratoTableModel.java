@@ -1,6 +1,8 @@
 package br.univates.sistemabancario.view.elements.tables;
 
 import br.univates.sistemabancario.model.Transacao;
+
+import java.util.Collections;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
@@ -15,6 +17,7 @@ public class ExtratoTableModel extends AbstractTableModel {
 
     public ExtratoTableModel(List<Transacao> transacoes) {
         this.transacoes = transacoes;
+        Collections.sort(this.transacoes);
     }
 
     @Override

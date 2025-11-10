@@ -66,6 +66,17 @@ public interface IDao<T, K> {
     public void update(T objeto) throws RecordNotFoundException, DataBaseException;
 
     /**
+     * Atualiza um objeto existente no repositório de dados.
+     * Recebe a conexão com o banco de dados, para garantir operações múltiplas
+     *
+     * @param objeto - objeto contendo os dados atualizados.
+     * @param db - conexão com o banco
+     * @throws RecordNotFoundException - registro não encontrado no banco de dados
+     * @throws DataBaseException - erro de comunicação com o banco
+     */
+    public void update(T objeto, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException;
+
+    /**
      * Remove um objeto do repositório de dados.
      *
      * @param objeto - objeto a ser removido (identificado por sua chave).

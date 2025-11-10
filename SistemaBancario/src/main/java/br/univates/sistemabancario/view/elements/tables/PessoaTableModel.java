@@ -1,6 +1,8 @@
 package br.univates.sistemabancario.view.elements.tables;
 
 import br.univates.alexandria.models.Pessoa;
+
+import java.util.Collections;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
@@ -15,6 +17,7 @@ public class PessoaTableModel extends AbstractTableModel {
 
     public PessoaTableModel(List<Pessoa> pessoas) {
         this.pessoas = pessoas;
+        Collections.sort(this.pessoas);
     }
 
     @Override

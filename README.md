@@ -1,135 +1,193 @@
-# 💳 Sistema Bancário Simples
+# 💳 Sistema Bancário (Desktop Swing)
 
-Este projeto é uma aplicação de console com interface gráfica (Swing) em **Java** que simula as operações básicas de um sistema bancário. Foi desenvolvido como exercício prático para aplicar conceitos de arquitetura de software, persistência de dados e Programação Orientada a Objetos (POO).
-
----
-
-## 📝 Sobre o Projeto
-
-O **Sistema Bancário** permite o gerenciamento de correntistas e suas respectivas contas bancárias. Os usuários podem realizar operações de **CRUD** (Criar, Ler, Atualizar, Deletar) para correntistas, criar contas bancárias (normais e especiais), realizar depósitos, saques e consultar extratos de transações. Todos os dados são persistidos em arquivos de texto (`.dat`), simulando uma camada de persistência simples.
+Uma aplicação desktop em Java (Swing) que simula um sistema bancário completo — gerencia correntistas, contas (normais e especiais), transações e extratos. Foi desenvolvida como projeto prático para aplicar POO, arquitetura em camadas (MVC adaptado) e persistência com SQLite.
 
 ---
 
-## ⚙️ Principais Funcionalidades
+Índice
 
-### 👤 Gerenciamento de Correntistas
-- Cadastro, edição e exclusão de correntistas
-- Validação de CPF e prevenção de duplicados
-
-### 🏦 Gerenciamento de Contas Bancárias
-- Criação de contas normais e contas especiais (com limite de cheque especial)
-- Geração automática de números de conta únicos ou definição manual
-- Associação de cada conta a um correntista
-
-### 💰 Operações Financeiras
-- Realização de depósitos e saques
-- Validação de saldo e limites
-
-### 🗂️ Persistência de Dados
-- Todas as informações de correntistas, contas e transações são salvas em arquivos de texto locais
-
-### 🖥️ Interface com o Usuário
-- Menus de console interativos para navegação
-- Janelas de diálogo (Swing) para entrada de dados em cadastros e edições
+- [🚀 Visão geral](#visao-geral)
+- [✨ Principais funcionalidades](#principais-funcionalidades)
+- [🏗️ Arquitetura e organização do código](#arquitetura-e-organizacao-do-codigo)
+- [🛠️ Como executar (build & run)](#como-executar-build--run)
+- [📁 Estrutura do repositório (resumo)](#estrutura-do-repositorio-resumo)
+- [✅ Boas práticas e decisões de design](#boas-praticas-e-decisoes-de-design)
+- [♻️ Evoluções](#evolucoes)
+- [🤝 Como contribuir](#como-contribuir)
+- [📝 Licença](#licenca)
 
 ---
 
-## 🏗️ Estrutura do Projeto
+<a name="visao-geral"></a>
 
-O projeto é modularizado em duas partes principais para promover a reutilização e a separação de responsabilidades:
+## 🚀 Visão geral
 
-### 1️⃣ Alexandria (Biblioteca Core)
-Atua como biblioteca de utilitários compartilhados, com código genérico reutilizável em outros projetos.
+O Sistema Bancário oferece uma interface gráfica completa construída com Java Swing e navegação baseada em CardLayout. Todas as operações sobre contas e correntistas são persistidas em um banco de dados SQLite (`sistemabancario.db`) e o acesso a dados é encapsulado por DAOs, facilitando manutenção e testes.
 
-- **exceptions**: Classes de exceção genéricas (`CpfInvalidoException`, `NullInputException`)
-- **models**: Modelos de dados fundamentais (`Pessoa`, `CPF`)
-- **repository**: Interface `BaseDAO` como contrato para operações de persistência
-- **util**: Ferramentas úteis para manipulação de arquivos, formatação, entrada de dados, exibição de mensagens e validações
-- **view**: Classe base `Menu.java` para criação de menus de console
+Público-alvo: estudantes e desenvolvedores que querem estudar:
 
-### 2️⃣ SistemaBancario (Aplicação Principal)
-Implementa a lógica de negócio específica do sistema bancário, utilizando a biblioteca Alexandria.
-
-- **exceptions**: Exceções do domínio bancário (`ContaJaExisteException`, `SaldoInvalidoException`)
-- **repository/persist**: Classes DAO responsáveis pela persistência:
-  - `CorrentistaDAO.java` (arquivo `correntista.dat`)
-  - `ContaBancariaDAO.java` (arquivo `conta_bancaria.dat`)
-  - `TransacaoDAO.java` (arquivo `transacao.dat`)
-- **service/business**: Camada de lógica de negócio
-  - `ContaBancaria.java` e `ContaBancariaEspecial.java`: Tipos de contas e regras
-  - `Numero.java`: Modela o número da conta
-  - `Transacao.java`: Movimentação financeira
-- **view**: Menus (`MenuContasCorrentistas`, `MenuBanco`, etc.) e telas Swing (`TelaCadastroConta`, `TelaEditarUsuario`, etc.)
+- arquitetura em camadas (View / Controller / Model),
+- padrões DAO e Factory,
+- gerenciamento transacional com SQLite,
+- desenvolvimento de interfaces Swing com modelos de tabela customizados.
 
 ---
 
-## 🏛️ Arquitetura e Decisões de Design
+<a name="principais-funcionalidades"></a>
 
-### 🏢 Arquitetura em Camadas
-- **View (UI)**: Interação com o usuário (menus e telas)
-- **Service/Business**: Regras e comportamento do sistema
-- **Repository/Persistence**: Abstração do acesso a dados
+## ✨ Principais funcionalidades
 
-### 📦 Padrão DAO (Data Access Object)
-Isola a lógica de negócio da persistência de dados, permitindo futura alteração da forma de armazenamento (ex: banco de dados).
-
-### 🔌 Injeção de Dependência (DI)
-Instâncias de DAOs são criadas uma única vez na classe `TelaPrincipal` e "injetadas" via construtor nas classes que delas necessitam.
-
-**Benefícios:**
-- Fonte Única de Verdade
-- Testabilidade (facilidade para mocks)
-- Baixo Acoplamento
+- Gerenciamento de correntistas
+  - Cadastro, edição e exclusão
+  - Validação de CPF e prevenção de duplicatas
+- Gerenciamento de contas
+  - Criar contas normais e contas especiais (com limite de cheque)
+  - Associação conta ↔ correntista
+  - Geração automática de números de conta formatados
+- Operações financeiras
+  - Depósito, saque e transferência (operacionalmente atômicas)
+  - Registro de transações e visualização de extrato (ordenado por data)
+- Interface
+  - Aplicação totalmente Swing (painéis, formulários `.form` e JTable customizadas)
+  - Navegação por `FramePrincipal` + `CardLayout`
+- Persistência
+  - Banco SQLite (`sistemabancario.db`)
+  - Padrão DAO para isolar a camada de persistência
+  - Gerenciamento explícito de transações (BEGIN / COMMIT / ROLLBACK)
 
 ---
 
-## 🚀 Como Executar o Projeto
+<a name="arquitetura-e-organizacao-do-codigo"></a>
 
-### Pré-requisitos
-- Java Development Kit (JDK) 11 ou superior
+## 🏗️ Arquitetura e organização do código
+
+Projeto modularizado em duas partes:
+
+1. Alexandria (biblioteca core)
+
+   - Utilitários e modelos reutilizáveis
+   - Gerenciamento de conexão JDBC
+   - Exceções e interfaces genéricas (IDao, IFilter)
+   - Classes: CPF, Pessoa, FormatadorTexto, Verificador, DataBaseConnectionManager, etc.
+
+2. SistemaBancario (aplicação principal)
+   - Controllers: gerenciam interações entre View e serviço/DAO
+   - Views: painéis Swing e formulários (`.form` e `.java`)
+   - Repositórios/DAOs: `ContaBancariaDAO`, `TransacaoDAO`, `CorrentistaDAO`, `DAOFactory`
+   - Models/Service: `ContaBancaria`, `ContaBancariaEspecial`, `Transacao`, `Numero`
+
+Padrões adotados:
+
+- MVC (Model / View / Controller) adaptado
+- DAO + Factory
+- Injeção de dependências via construtores (controllers recebem DAOs/serviços)
+- Gerenciamento explícito de transações para operações que alteram múltiplas tabelas
+
+---
+
+<a name="como-executar-build--run"></a>
+
+## 🛠️ Como executar (build & run)
+
+Pré-requisitos
+
+- Java 11+ (JDK)
 - Apache Maven
+- (Opcional) IDE: NetBeans / IntelliJ / Eclipse (suporta arquivos `.form`)
 
-### Passos
+Passos rápidos
 
-1. **Clone o repositório:**
-   ```bash
-   git clone <url-do-repositorio>
-   ```
+1. Clone o repositório:
 
-2. **Compile a biblioteca Alexandria:**
-   ```bash
-   cd Alexandria
-   mvn clean install
-   ```
+```bash
+git clone <url-do-repositorio>
+```
 
-3. **Compile e execute a aplicação SistemaBancario:**
-   ```bash
-   cd ../SistemaBancario
-   mvn clean package
-   java -jar target/SistemaBancario-1.0-SNAPSHOT.jar
-   ```
+2. Build da biblioteca Alexandria:
 
-A aplicação iniciará, exibindo o menu principal no console.
+```bash
+cd Alexandria
+mvn clean install
+```
 
----
+3. Build e execução da aplicação:
 
-## 📈 Evoluções e Melhorias Futuras
+```bash
+cd ../SistemaBancario
+mvn clean package
+java -jar target/SistemaBancario-1.0-Sigma.jar
+```
 
-- **Introduzir Camada de Serviço:** Formalizar entre View e DAOs para melhor separação
-- **Utilizar Enums:** Converter constantes `char` (como `MOV_DEBITO`, `MOV_CREDITO`) para Enums
+Observações
 
----
-
-## 🧑‍💻 Contribuição
-
-Sinta-se à vontade para contribuir com sugestões, melhorias ou relatando bugs! 
+- O arquivo de banco `sistemabancario.db` encontra-se no diretório `SistemaBancario` para conveniência; o path também pode ser configurado em `src/main/resources/config.properties`.
+- Para desenvolvimento com IDE (NetBeans): abra o diretório raiz ou cada módulo separadamente. Os arquivos `.form` fornecem integração visual com o NetBeans GUI Builder.
 
 ---
 
-## 📄 Licença
+<a name="estrutura-do-repositorio-resumo"></a>
 
-Este projeto está sob licença MIT.
+## 📁 Estrutura do repositório (resumo)
+
+Raiz contendo dois módulos principais:
+
+- Alexandria/ (biblioteca core)
+  - src/main/java/.../alexandria/{exceptions, interfaces, models, repository, util, view}
+- SistemaBancario/ (aplicação Swing)
+  - src/main/java/.../sistemabancario/{controller, repository, service, view, exceptions}
+  - src/main/resources/{config.properties, images}
+  - sistemabancario.db (SQLite)
+
+(Árvore completa e detalhada foi enviada junto ao projeto.)
 
 ---
 
-**Projeto desenvolvido para fins educacionais.**
+<a name="boas-praticas-e-decisoes-de-design"></a>
+
+## ✅ Boas práticas e decisões de design
+
+- Injeção de dependências via construtor facilita testabilidade e garante única instância de DAOs (evita conflitos de acesso ao arquivo/DB).
+- DAOs isolam SQL e o mapeamento para modelos, permitindo trocar a persistência sem afetar a lógica de negócio.
+- Uso de transações para garantir atomicidade em operações que alteram várias entidades (ex.: transferência).
+- Modelos de tabela customizados (TableModel) para desacoplar camada de UI da lógica de dados.
+
+---
+
+<a name="evolucoes"></a>
+
+## ♻️ Evoluções
+
+Prioridade alta
+
+- Substituir strings/constantes por Enums (ex.: tipos de movimento DEBITO / CREDITO)
+
+Melhorias avançadas
+
+- Migrar para ORM leve (ex.: JDBI) ou usar um banco mais robusto dependendo do escopo
+- Melhorias de UX no Swing (temas, validações inline, feedbacks em tempo real)
+
+---
+
+<a name="como-contribuir"></a>
+
+## 🤝 Como contribuir
+
+- Abra issues descrevendo bugs, melhorias ou recursos desejados.
+- Para mudanças de código:
+  1. Fork o repositório
+  2. Crie uma branch com a feature/bugfix
+  3. Faça commits claros e pequenos
+  4. Abra um Pull Request descrevendo mudanças e motivação
+- Sugestões de testes e casos de borda são muito bem-vindos (ex.: validação de CPF, limites de saque, concorrência nas operações).
+
+---
+
+<a name="licenca"></a>
+
+## 📝 Licença
+
+MIT — consulte o arquivo LICENSE para detalhes.
+
+---
+
+Desenvolvido para fins educacionais.

@@ -18,8 +18,7 @@ import java.util.Date;
 
 import br.univates.alexandria.exceptions.DataBaseException;
 
-public class DataBaseConnectionManager
-{
+public class DataBaseConnectionManager {
 
     public final static int MYSQL = 0;
     public final static int POSTGRESQL = 1;
@@ -35,138 +34,97 @@ public class DataBaseConnectionManager
 
     private String scriptPath;
 
-    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw) throws DataBaseException
-    {
+    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw) throws DataBaseException {
         this(dbms, dataBaseName, user, pw, null, null);
     }
 
-    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw, String ip) throws DataBaseException
-    {
+    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw, String ip) throws DataBaseException {
         this(dbms, dataBaseName, user, pw, ip, null);
     }
 
-    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw, String ip, String port) throws DataBaseException
-    {
-        if (dbms < 0 || dbms > 2) // dbms desconhecido
-        {
-            throw new DataBaseException("O número do SGBD está errado: [0] MySQL; [1] Postgresql; [2] SQLite ");
-        }
+    public DataBaseConnectionManager(int dbms, String dataBaseName, String user, String pw, String ip, String port) throws DataBaseException {
+        // dbms desconhecido
+        if (dbms < 0 || dbms > 2) throw new DataBaseException("O número do SGBD está errado: [0] MySQL; [1] Postgresql; [2] SQLite ");
+        
 
         ip = (ip == null ? "localhost" : ip);
-
-        String[] ports =
-        {
-            "3306", "5432", ""
-        };
+        String[] ports ={"3306", "5432", ""};
         port = (port == null ? ports[dbms] : port);
 
-        String[] jdbc =
-        {
+        String[] jdbc ={
             "jdbc:mysql://" + ip + ":" + port + "/" + dataBaseName,
             "jdbc:postgresql://" + ip + ":" + port + "/" + dataBaseName,
             "jdbc:sqlite:" + dataBaseName
         };
 
-        if (dataBaseName == null)
-        {
-            throw new DataBaseException("Falta definir o nome da base de dados");
-        }
-
-        if (user == null && pw == null)
-        {
-            throw new DataBaseException("Falta definir usuário e senha da base de dados");
-        }
-
+        if (dataBaseName == null) throw new DataBaseException("Falta definir o nome da base de dados");
+        if (user == null && pw == null) throw new DataBaseException("Falta definir usuário e senha da base de dados");
+        
         this.url = jdbc[dbms];
         this.dataBaseName = dataBaseName;
         this.user = user;
         this.password = pw;
     }
 
-    public void connectDataBase() throws DataBaseException
-    {
+    public void connectDataBase() throws DataBaseException{
         this.connection = null;
-        try
-        {
-            if (user == null || user.isEmpty())
-            {
+        try {
+            if (user == null || user.isEmpty()) {
                 Connection c = DriverManager.getConnection(url);
                 this.connection = c;
-            } else
-            {
+            } else {
                 Connection c = DriverManager.getConnection(url, this.user, this.password);
                 this.connection = c;
             }
-        } catch (SQLException ex)
-        {
+        } catch (SQLException ex) {
             throw new DataBaseException("A conexão com o banco de dados falhou");
         }
     }
 
     /**
-     * *
      * Abre e fecha uma conexão com o banco de dados. Realiza um teste conexão
      * com o banco.
-     *
      * @throws DataBaseException
      */
-    public void connectionTest() throws DataBaseException
-    {
-        try
-        {
+    public void connectionTest() throws DataBaseException {
+        try {
             connectDataBase();
             this.connection.close();
             this.connection = null;
-        } catch (DataBaseException ex)
-        {
-            throw new DataBaseException("O teste de conexão com o banco de dados falhou");
-        } catch (SQLException ex)
-        {
+        } catch (DataBaseException | SQLException ex) {
             throw new DataBaseException("O teste de conexão com o banco de dados falhou");
         }
     }
 
-    public void runSQL(String sql) throws DataBaseException
-    {
-        try
-        {
-            if (this.connection == null || this.connection.isClosed())
-            {
+    public void runSQL(String sql) throws DataBaseException {
+        try {
+            if (this.connection == null || this.connection.isClosed()) {
                 this.connectDataBase();
             }
             executeSQL(sql);
-        } catch (SQLException ex)
-        {
+        } catch (SQLException ex){
             throw new DataBaseException("Erro na execução de uma instrução SQL");
         }
     }
 
-    public void runPreparedSQL(String sql, Object... args) throws DataBaseException
-    {
-        
-        try
-        {
-            if (this.connection == null || this.connection.isClosed())
-            {
+    public void runPreparedSQL(String sql, Object... args) throws DataBaseException{  
+        try{
+            if (this.connection == null || this.connection.isClosed()){
                 this.connectDataBase();
             }
             executePreparedSQL(sql, args);
-        } catch (SQLException ex)
-        {
+        } catch (SQLException ex){
             throw new DataBaseException("Erro na execução de uma instrução SQL");
         }
     }
-    public ResultSet runQuerySQL(String sql) throws DataBaseException
-    {
-        try
-        {
-            if (this.connection == null || this.connection.isClosed())
-            {
+
+    public ResultSet runQuerySQL(String sql) throws DataBaseException {
+        try{
+            if (this.connection == null || this.connection.isClosed()) {
                 this.connectDataBase();
             }
             this.rs = executeQuerySQL(sql);
-        } catch (SQLException ex)
-        {
+        } catch (SQLException ex){
             throw new DataBaseException("Erro em runQuerySQL");
         }
         return rs;

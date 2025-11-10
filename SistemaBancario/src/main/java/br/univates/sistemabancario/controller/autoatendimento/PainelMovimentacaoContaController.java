@@ -6,7 +6,9 @@ import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.model.ContaBancaria;
 import br.univates.sistemabancario.model.Transacao;
@@ -49,8 +51,9 @@ public class PainelMovimentacaoContaController {
         if(operacao > 1){
             throw new IllegalArgumentException("Indicador inválido fornecido");
         } else {
+            this.view.adicionarAcaoBotao(e -> realizarMovimentacao(operacao));
+
             if(operacao == 0){
-                this.view.adicionarAcaoBotao(e -> sacarValor());
                 this.view.getButton().setText("Sacar");
                 this.view.getTitleLabel().setText("Sacar");
                 
@@ -66,7 +69,6 @@ public class PainelMovimentacaoContaController {
                     }
                 );
             } else {
-                this.view.adicionarAcaoBotao(e -> depositarValor());
                 this.view.getButton().setText("Depositar");
                 this.view.getTitleLabel().setText("Depositar");
                 
@@ -97,17 +99,106 @@ public class PainelMovimentacaoContaController {
             this.view.exibirErro("Falha ao carregar correntistas: " + ex.getMessage());
         }
     }
+
+    /**
+     * Classe auxiliar que representa os dados de uma movimentação
+     */
+    private class InfoMovimentacao {
+        private Transacao t;
+        private ContaBancaria cb;
+
+        public InfoMovimentacao(Transacao t, ContaBancaria cb){
+            this.t = t;
+            this.cb = cb;
+        }
+
+        // Getters
+        public Transacao getTransacao(){
+            return this.t;
+        }
+
+        public ContaBancaria getContaBancaria(){
+            return this.cb;
+        }
+    }
+
+    /**
+     * Método auxiliar que unifica as chamadas de métodos de movimentação
+     */
+    private void realizarMovimentacao(int operacao){
+        // Retorna uma conta e uma transação
+        InfoMovimentacao im = null;
+
+        if (operacao == 0) {
+            im = prepararSaque();
+        } else {
+            im = prepararDeposito();
+        }
+
+        if (im != null){
+            DataBaseConnectionManager db = null;
+            ContaBancaria cb = im.getContaBancaria();
+            Transacao t = im.getTransacao();
+    
+            try{
+                db = DAOFactory.getDataBaseConnectionManager();
+
+                // Início da transação
+                db.runSQL("BEGIN TRANSACTION;");
+                this.tdao.create(t, db);
+                this.cbdao.update(cb, db);
+
+                // Em caso de sucesso
+                db.runSQL("COMMIT;");
+                this.view.exibirSucesso("Sucesso na transação! \n\n" + cb.consultarStatus());
+                this.view.getQuantidadeTf().setText("");
+                this.view.getPainelCorrentistaContaBancaria().getCbContaBancaria().setSelecionado(null);
+                this.view.getPainelCorrentistaContaBancaria().getCbCorrentista().setSelecionado(null);
+    
+            } catch (DataBaseException | RecordNotFoundException e) {
+                // Em caso de erro
+                this.view.exibirErro("Erro de banco de dados: " + e.getMessage());
+                if (db != null) {
+                    try {
+                        db.runSQL("ROLLBACK;");
+                    } catch (DataBaseException e2) {
+                        this.view.exibirErro("Erro crítico ao reverter a transação: " + e2.getMessage());
+                    }
+                }
+    
+                // Reverte alterações em memória
+                try {
+                    if (operacao == 0) {
+                        cb.depositaValor(t.getValor());
+                    } else {
+                        cb.sacarValor(t.getValor());
+                    }
+                } catch (SaldoInvalidoException ex) {
+                    // Não acontece
+                }
+                
+            } finally {
+                // Sempre fecha a conexão
+                try {
+                    if (db != null) {
+                        db.closeConnection();
+                    }
+                } catch (DataBaseException e) {
+                    this.view.exibirErro("Erro crítico ao encerrar conexão com o banco: " + e.getMessage());
+                }
+            }
+        }
+    }
     
     
     /**
-     * Método responsável por depositar um valor na conta selecionada
+     * Método responsável por preparar um depósito de um valor na conta selecionada
+     * @return - objeto de InfoMovimentacao com conta e transação
      */
-    private void depositarValor() {
+    private InfoMovimentacao prepararDeposito() {
         try {
             String strQtd = this.view.getQuantidadeTf().getText();
-            
             Double dQtde = Double.valueOf(strQtd);
-            
             ContaBancaria cb = this.pccController.getContaSelecionada();
             
             if (cb == null){
@@ -125,29 +216,23 @@ public class PainelMovimentacaoContaController {
                     cb.getNumeroConta()
             );
 
-            this.tdao.create(t);
-            this.cbdao.update(cb);
+            return new InfoMovimentacao(t, cb);
 
-            this.view.exibirSucesso("Sucesso na transação! \n\n" + cb.consultarStatus());
-
-        } catch (DataBaseException e) {
-            this.view.exibirErro("Erro de conexão com o banco de dados.");
-        } catch (RecordNotFoundException e) {
-            this.view.exibirErro("Conta bancária não encontrada.");
         } catch (SaldoInvalidoException | IllegalArgumentException e){
             this.view.exibirErro(e.getMessage());
         }
+
+        return null;
     }
     
     /**
-     * Método responsável por sacar um valor da conta selecionada
+     * Método responsável por preparar um saque de um valor da conta selecionada
+     * @return - objeto de InfoMovimentacao com conta e transação
      */
-    private void sacarValor() {
+    private InfoMovimentacao prepararSaque() {
         try {
             String strQtd = this.view.getQuantidadeTf().getText();
-            
             Double dQtde = Double.valueOf(strQtd);
-            
             ContaBancaria cb = this.pccController.getContaSelecionada();
             
             if (cb == null){
@@ -165,17 +250,12 @@ public class PainelMovimentacaoContaController {
                     cb.getNumeroConta()
             );
 
-            this.tdao.create(t);
-            this.cbdao.update(cb);
+            return new InfoMovimentacao(t, cb);
 
-            this.view.exibirSucesso("Sucesso na transação! \n\n" + cb.consultarStatus());
-
-        } catch (DataBaseException e) {
-            this.view.exibirErro("Erro de conexão com o banco de dados.");
-        } catch (RecordNotFoundException e) {
-            this.view.exibirErro("Conta bancária não encontrada.");
         } catch (SaldoInvalidoException | IllegalArgumentException e){
             this.view.exibirErro(e.getMessage());
         }
+
+        return null;
     }
 }

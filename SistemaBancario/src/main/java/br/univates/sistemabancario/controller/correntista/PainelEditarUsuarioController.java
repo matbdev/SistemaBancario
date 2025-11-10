@@ -30,18 +30,22 @@ public class PainelEditarUsuarioController {
         
         this.view.adicionarAcaoBotao(e -> editarUsuario());
         this.view.adicionarAcaoCombobox(e -> carregarDadosUsuario());
-        carregarDados();
+        
+        try {
+            carregarDados();
+        } catch (RecordNotReady | DataBaseException ex) {
+            this.view.exibirErro("Falha ao carregar correntistas: " + ex.getMessage());
+        }
     }
     
     /**
      * Carrega os dados no ComboBox usando o controller focado.
+     * @throws DataBaseException - erro de conexão com o banco de dados
+     * @throws RecordNotReady - erro de atributo no registro
      */
-    public void carregarDados() {
-        try {
-            this.pbbController.carregarDados();
-        } catch (RecordNotReady | DataBaseException ex) {
-            this.view.exibirErro("Falha ao carregar correntistas: " + ex.getMessage());
-        }
+    public void carregarDados() throws RecordNotReady, DataBaseException {
+        this.pbbController.carregarDados();
+        this.carregarDadosUsuario();
     }
     
     // Carrega os dados do usuário com base na seleção
@@ -50,8 +54,10 @@ public class PainelEditarUsuarioController {
         
         if (correntista != null) {
             this.view.getEndereco().setText(correntista.getEndereco());
+            this.view.getEndereco().setEditable(true);
             this.view.getNome().setText(correntista.getNome());
-            this.view.getCpf().setText(correntista.getCpfFormatado());
+            this.view.getNome().setEditable(true);
+            this.view.getCpf().setText(correntista.getCPF().getCpfFormatado());
         } else {
             this.view.getEndereco().setText("");
             this.view.getEndereco().setEditable(false);
@@ -79,7 +85,7 @@ public class PainelEditarUsuarioController {
                 throw new IllegalArgumentException("Altere pelo menos um dos campos.");
             }
 
-            Pessoa p = new Pessoa(correntistaSelecionado.getCpfNumbers(), nome, endereco);
+            Pessoa p = new Pessoa(correntistaSelecionado.getCPF().getCpf(), nome, endereco);
             this.cdao.update(p);
             
             this.view.exibirSucesso("Correntista editado com sucesso!");

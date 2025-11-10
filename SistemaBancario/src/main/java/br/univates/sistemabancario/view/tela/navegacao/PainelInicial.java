@@ -17,7 +17,7 @@ public class PainelInicial extends javax.swing.JPanel implements DefaultInterfac
      */
     @Override
     public void adicionarAcaoBotao(java.awt.event.ActionListener listener) {
-        System.exit(0);
+        this.botao.addActionListener(listener);
     }
 
     /**

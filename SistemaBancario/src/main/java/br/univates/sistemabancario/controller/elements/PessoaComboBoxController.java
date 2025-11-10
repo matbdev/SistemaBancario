@@ -16,7 +16,7 @@ public class PessoaComboBoxController {
     private final PessoaComboBox comboBoxView;
     private final IDao<Pessoa, CPF> cdao;
 
-    // Construtor
+    // Constructor
     public PessoaComboBoxController(PessoaComboBox comboBoxView, IDao<Pessoa, CPF> cdao) {
         this.comboBoxView = comboBoxView;
         this.cdao = cdao;
@@ -29,6 +29,14 @@ public class PessoaComboBoxController {
      */
     public void carregarDados() throws DataBaseException, RecordNotReady {
         ArrayList<Pessoa> pessoas = cdao.readAll();
+        comboBoxView.setDados(pessoas);
+    }
+
+    /**
+     * Define lista de contas bancárias (com base na seleção de uma pessoa)
+     * @param pessoas - lista de pessoas filtradas
+     */
+    public void setDados(ArrayList<Pessoa> pessoas) {
         comboBoxView.setDados(pessoas);
     }
 

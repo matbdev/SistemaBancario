@@ -116,10 +116,10 @@ public class Transacao implements Comparable<Transacao> {
      * Método sobrescrito da interface comparable
      * Compara duas datas
      * @param t - o objeto da outra transação
-     * @return resultado da comparação das datas
+     * @return resultado da comparação das datas (ordem decrescente - mais recente primeiro)
      */
     @Override
     public int compareTo(Transacao t) {
-        return this.getDateTime().compareTo(t.getDateTime());
+        return t.getDateTime().compareTo(this.getDateTime());
     }
 }

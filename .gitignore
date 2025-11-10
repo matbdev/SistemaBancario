@@ -1,6 +1,7 @@
 # Não necessários
 */target/
 *.form
+*.zip
 
 # Configurações vscode
 .vscode

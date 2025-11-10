@@ -82,7 +82,7 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
                 novoSaldo,
                 String.format(
                         "O novo saldo da conta %s será menor do que R$%.2f.\nOperação cancelada",
-                        getNumeroContaFormatado(), getLimite()));
+                        getNumeroConta().getNumero(), (-1) * getLimite()));
 
         this.saldo = novoSaldo;
     }
@@ -94,18 +94,6 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
 
     public Pessoa getPessoa() {
         return this.pessoa;
-    }
-
-    public String getNome() {
-        return getPessoa().getNome();
-    }
-
-    public String getCpfFormatado() {
-        return getPessoa().getCpfFormatado();
-    }
-
-    public String getEndereco() {
-        return getPessoa().getEndereco();
     }
 
     public double getLimite() {
@@ -120,16 +108,8 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
         return this.nConta;
     }
 
-    public String getNumeroContaFormatado() {
-        return this.getNumeroConta().getNumero();
-    }
-
-    public int getNumeroContaInt() {
-        return this.getNumeroConta().getNumeroInt();
-    }
-
     public String getLineForSave() {
-        return getPessoa().getCpfNumbers() + ";" + getNumeroContaInt() + ";" + getSaldo() + ";" + getLimite() + ";"
+        return getPessoa().getCPF().getCpf() + ";" + this.getNumeroConta().getNumeroInt() + ";" + getSaldo() + ";" + getLimite() + ";"
                 + getTipoConta();
     }
 
@@ -150,15 +130,15 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
     public String consultarStatus() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Número da Conta: ").append(getNumeroContaFormatado());
+        sb.append("Número da Conta: ").append(getNumeroConta().getNumero());
         sb.append("\nTipo de conta: ").append(getTipoConta());
 
         if (!getTipoConta().equals("ContaBancaria")) // Só mostra limite caso for especial
             sb.append("\nLimite especial: R$").append(getLimite());
 
-        sb.append("\nTitular da conta: ").append(getNome());
-        sb.append("\nCPF do titular: ").append(getCpfFormatado());
-        sb.append("\nEndereço do titular: ").append(getEndereco());
+        sb.append("\nTitular da conta: ").append(getPessoa().getNome());
+        sb.append("\nCPF do titular: ").append(getPessoa().getCPF().getCpfFormatado());
+        sb.append("\nEndereço do titular: ").append(getPessoa().getEndereco());
         sb.append("\nSaldo atual: R$").append(getSaldo());
 
         return sb.toString();
@@ -182,7 +162,7 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
      */
     @Override
     public int compareTo(ContaBancaria cb) {
-        return this.getNumeroContaInt() - cb.getNumeroContaInt();
+        return this.getNumeroConta().getNumeroInt() - cb.getNumeroConta().getNumeroInt();
     }
 
     /**
@@ -197,7 +177,7 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
         boolean r = false;
         if (obj != null && obj instanceof ContaBancaria) {
             ContaBancaria outraConta = (ContaBancaria) obj;
-            r = this.getNumeroContaFormatado().equals(outraConta.getNumeroContaFormatado());
+            r = this.getNumeroConta().getNumero().equals(outraConta.getNumeroConta().getNumero());
         }
         return r;
     }
@@ -211,7 +191,7 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
      */
     @Override
     public int hashCode() {
-        return this.getNumeroContaFormatado().hashCode();
+        return this.getNumeroConta().getNumero().hashCode();
     }
 
     /**
@@ -221,6 +201,6 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
      */
     @Override
     public String toString() {
-        return "Conta: " + this.getNumeroContaFormatado() + " | " + this.getNome();
+        return "Conta: " + this.getNumeroConta().getNumero() + " | " + this.getPessoa().getNome();
     }
 }

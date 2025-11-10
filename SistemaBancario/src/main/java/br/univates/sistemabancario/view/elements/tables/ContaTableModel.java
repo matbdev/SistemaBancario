@@ -1,6 +1,8 @@
 package br.univates.sistemabancario.view.elements.tables;
 
 import br.univates.sistemabancario.model.ContaBancaria;
+
+import java.util.Collections;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
@@ -15,6 +17,7 @@ public class ContaTableModel extends AbstractTableModel {
 
     public ContaTableModel(List<ContaBancaria> contas) {
         this.contas = contas;
+        Collections.sort(this.contas);
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ContaTableModel extends AbstractTableModel {
         ContaBancaria cb = contas.get(rowIndex);
 
         switch (columnIndex) {
-            case 0 -> {return cb.getNumeroContaFormatado();}
+            case 0 -> {return cb.getNumeroConta().getNumero();}
             case 1 -> {return cb.getPessoa().getCPF().getCpfFormatado();}
             case 2 -> {return cb.getTipoConta();}
             case 3 -> {return "R$" + cb.getLimite();}

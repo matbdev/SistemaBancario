@@ -1,8 +1,11 @@
 package br.univates.sistemabancario.controller;
 
+import br.univates.alexandria.exceptions.DataBaseException;
+import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
+import br.univates.alexandria.util.Messages;
 import br.univates.sistemabancario.controller.autoatendimento.PainelCorrentistaContaBancariaController;
 import br.univates.sistemabancario.controller.autoatendimento.PainelMovimentacaoContaController;
 import br.univates.sistemabancario.controller.autoatendimento.PainelTransferenciaContaController;
@@ -29,6 +32,9 @@ import br.univates.sistemabancario.view.tela.correntista.PainelRemoverUsuario;
 import br.univates.sistemabancario.view.tela.correntista.PainelVisualizarUsuarios;
 import br.univates.sistemabancario.view.tela.navegacao.FramePrincipal;
 import br.univates.sistemabancario.view.tela.navegacao.PainelInicial;
+
+import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 /**
@@ -95,7 +101,11 @@ public class FramePrincipalController {
     private void inicializarPaineis() {
         JPanel painelPrincipal = view.getPainelPrincipal();
 
-        JPanel painelHome = new PainelInicial();
+        PainelInicial painelHome = new PainelInicial();
+        painelHome.adicionarAcaoBotao(e -> {
+            Messages.infoMessage(painelHome, "Saindo da aplicação...");
+            System.exit(0);
+        });
         painelPrincipal.add(painelHome, "inicio");
         
         // Paineis referentes a correntista
@@ -108,7 +118,7 @@ public class FramePrincipalController {
         painelPrincipal.add(painelEditarUsuario, "editarUser");
 
         PainelRemoverUsuario painelRemoverUsuario = new PainelRemoverUsuario();
-        this.painelRemoverUsuarioController = new PainelRemoverUsuarioController(cdao, painelRemoverUsuario);
+        this.painelRemoverUsuarioController = new PainelRemoverUsuarioController(cdao, cbdao, painelRemoverUsuario);
         painelPrincipal.add(painelRemoverUsuario, "removerUser");
         
         PainelVisualizarUsuarios painelVisualizarUsuarios = new PainelVisualizarUsuarios();
@@ -152,44 +162,143 @@ public class FramePrincipalController {
         view.getPaginaInicialMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "inicio"));
         view.getSairMenuItem().addActionListener(e -> System.exit(0));
         
-        // Correntista
+        // CORRENTISTA
+        // Cadastrar
         view.getCadastroCorrentistaMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "cadastroUser"));
-        view.getEditarCorrentistaMenuItem().addActionListener(e -> this.painelEditarUsuarioController.carregarDados());
-        view.getDeletarCorrentistaMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "removerUser"));
 
+        // Editar
+        view.getEditarCorrentistaMenuItem().addActionListener(e -> {
+            try{
+                verificarCorrentistasVazio();
+                this.painelEditarUsuarioController.carregarDados();
+                cardLayout.show(view.getPainelPrincipal(), "editarUser");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
+                view.exibirErro("Erro ao verificar correntistas: " + ex.getMessage());
+            }
+        });
+
+        // Deletar
+        view.getDeletarCorrentistaMenuItem().addActionListener(e -> {
+            try {
+                ArrayList<Pessoa> correntistasParaRemover = this.painelRemoverUsuarioController.getCorrentistasSemConta();
+                
+                if (correntistasParaRemover.isEmpty()) {
+                    view.exibirErro("Não há correntistas sem conta para remover.");
+                } else {
+                    this.painelRemoverUsuarioController.carregarDados();
+                    cardLayout.show(view.getPainelPrincipal(), "removerUser");
+                }
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
+                view.exibirErro("Erro ao verificar correntistas: " + ex.getMessage());
+            }
+        });
+
+        // Visualizar
         view.getVisualizarCorrentistasMenuItem().addActionListener(e -> {
             try {
+                verificarCorrentistasVazio();
                 this.painelVisualizarUsuariosController.carregarDados();
-            } catch (Exception ex) {
+                cardLayout.show(view.getPainelPrincipal(), "visualizarUser");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
             }
-            cardLayout.show(view.getPainelPrincipal(), "visualizarUser");
         });
 
-        // Conta Bancária
-        view.getAdicionarContaMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "cadastroConta"));
+        // CONTA BANCÁRIA
+        // Cadastro
+        view.getAdicionarContaMenuItem().addActionListener(e -> {
+            try{
+                verificarCorrentistasVazio();
+                this.painelCadastroContaController.carregarDados();
+                cardLayout.show(view.getPainelPrincipal(), "cadastroConta");
+            } catch (DataBaseException | RecordNotReady |RuntimeException ex) {
+                view.exibirErro("Erro ao verificar correntistas: " + ex.getMessage());
+            }
+        });
 
+        // Visualização
         view.getListarContasMenuItem().addActionListener(e -> {
             try {
+                verificarContasVazio();
                 this.painelVisualizarContasController.carregarDados();
-            } catch (Exception ex) {
+                cardLayout.show(view.getPainelPrincipal(), "visualizarContas");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
             }
-            cardLayout.show(view.getPainelPrincipal(), "visualizarContas");
         });
 
-        // Autoatendimento
-        view.getDepositarMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaDepositar"));
-        view.getPagarMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaSacar"));
-        view.getTransferenciaMenuItem().addActionListener(e -> cardLayout.show(view.getPainelPrincipal(), "transferirConta"));
+        // AUTOATENDIMENTO
+        // Depósito
+        view.getDepositarMenuItem().addActionListener(e -> {
+            try{
+                verificarContasVazio();
+                cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaDepositar");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
+                view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
+            }
+        });
 
+        // Saque
+        view.getPagarMenuItem().addActionListener(e -> {
+            try{
+                verificarContasVazio();
+                cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaSacar");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
+                view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
+            }
+        });
+
+        // Transferência
+        view.getTransferenciaMenuItem().addActionListener(e -> {
+            try{
+                ArrayList<ContaBancaria> cbList = cbdao.readAll();
+        
+                if (cbList.size() < 2) {
+                    throw new RuntimeException("Não há contas bancárias o suficiente para transferência.");
+                }
+                cardLayout.show(view.getPainelPrincipal(), "transferirConta");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
+                view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
+            }
+        });
+
+        // Extrato
         view.getExtratoMenuItem().addActionListener(e -> {
             try {
+                verificarContasVazio();
                 this.painelVisualizarExtratoController.carregarDados();
-            } catch (Exception ex) {
+                cardLayout.show(view.getPainelPrincipal(), "visualizarExtrato");
+            } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
             }
-            cardLayout.show(view.getPainelPrincipal(), "visualizarExtrato");
         });
+    }
+
+    /**
+     * Método auxiliar para verificação de correntista
+     * Verifica se há algum correntista cadastrado
+     * @throws DataBaseException - erro de conexão com o banco de dados
+     * @throws RecordNotReady - erro de atributo no registro
+     */
+    private void verificarCorrentistasVazio() throws DataBaseException, RecordNotReady{
+        ArrayList<Pessoa> cList = cdao.readAll();
+        
+        if (cList.isEmpty()) {
+            throw new RuntimeException("Não há correntistas para exibir.");
+        }
+    }
+
+    /**
+     * Método auxiliar para verificação de conta
+     * Verifica se há alguma conta bancária cadastrada
+     * @throws DataBaseException - erro de conexão com o banco de dados
+     * @throws RecordNotReady - erro de atributo no registro
+     */
+    private void verificarContasVazio() throws DataBaseException, RecordNotReady{
+        ArrayList<ContaBancaria> cbList = cbdao.readAll();
+        
+        if (cbList.isEmpty()) {
+            throw new RuntimeException("Não há contas bancárias para exibir.");
+        }
     }
 }

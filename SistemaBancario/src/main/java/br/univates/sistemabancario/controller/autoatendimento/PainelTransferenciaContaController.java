@@ -6,7 +6,9 @@ import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
+import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.model.ContaBancaria;
 import br.univates.sistemabancario.model.Transacao;
@@ -68,12 +70,19 @@ public class PainelTransferenciaContaController {
      * Método responsável por depositar um valor na conta selecionada
      */
     private void transferirValor() {
+        String strQtd = this.view.getQuantidadeTf().getText();
+        Double dQtde;
+        ContaBancaria cbOrigem;
+        ContaBancaria cbDestino;
+        Transacao tOrigem;
+        Transacao tDestino;
+
         try {
-            String strQtd = this.view.getQuantidadeTf().getText();
-            Double dQtde = Double.valueOf(strQtd);
+            strQtd = this.view.getQuantidadeTf().getText();
+            dQtde = Double.valueOf(strQtd);
             
-            ContaBancaria cbOrigem = this.pccControllerOrigem.getContaSelecionada();
-            ContaBancaria cbDestino = this.pccControllerDestino.getContaSelecionada();
+            cbOrigem = this.pccControllerOrigem.getContaSelecionada();
+            cbDestino = this.pccControllerDestino.getContaSelecionada();
             
             if (cbOrigem == null || cbDestino == null){
                 throw new IllegalArgumentException("Escolha duas contas");
@@ -86,7 +95,7 @@ public class PainelTransferenciaContaController {
             cbOrigem.sacarValor(dQtde);
             cbDestino.depositaValor(dQtde);
             
-            Transacao tOrigem = new Transacao(
+            tOrigem = new Transacao(
                     dQtde,
                     cbOrigem.getSaldo(),
                     Transacao.DEFAULT_DESC,
@@ -95,7 +104,7 @@ public class PainelTransferenciaContaController {
                     cbOrigem.getNumeroConta()
             );
             
-            Transacao tDestino = new Transacao(
+            tDestino = new Transacao(
                     dQtde,
                     cbDestino.getSaldo(),
                     Transacao.DEFAULT_DESC,
@@ -103,22 +112,66 @@ public class PainelTransferenciaContaController {
                     c.getTime(),
                     cbDestino.getNumeroConta()
             );
+            
+        } catch (SaldoInvalidoException | IllegalArgumentException e){
+            this.view.exibirErro(e.getMessage());
+            return;
+        }
 
-            this.tdao.create(tOrigem);
-            this.tdao.create(tDestino);
-            this.cbdao.update(cbOrigem);
-            this.cbdao.update(cbDestino);
+        // Lógica de banco de dados
+        DataBaseConnectionManager db = null;
+        try{
+            db = DAOFactory.getDataBaseConnectionManager();
+
+            // Uma única grande operação
+            db.runSQL("BEGIN TRANSACTION;");
+            
+            this.tdao.create(tOrigem, db);
+            this.tdao.create(tDestino, db);
+            this.cbdao.update(cbOrigem, db);
+            this.cbdao.update(cbDestino, db);
+
+            // Em caso de sucesso
+            db.runSQL("COMMIT;");
 
             this.view.exibirSucesso("Sucesso na transação!");
             this.view.exibirSucesso("Conta de origem: \n\n" + cbOrigem.consultarStatus());
             this.view.exibirSucesso("Conta de destino: \n\n" + cbDestino.consultarStatus());
+            
+            this.view.getQuantidadeTf().setText("");
+            this.view.getPainelCorrentistaContaBancariaOrigem().getCbContaBancaria().setSelecionado(null);
+            this.view.getPainelCorrentistaContaBancariaOrigem().getCbCorrentista().setSelecionado(null);
+            this.view.getPainelCorrentistaContaBancariaDestino().getCbContaBancaria().setSelecionado(null);
+            this.view.getPainelCorrentistaContaBancariaDestino().getCbCorrentista().setSelecionado(null);
 
-        } catch (DataBaseException e) {
-            this.view.exibirErro("Erro de conexão com o banco de dados.");
-        } catch (RecordNotFoundException e) {
-            this.view.exibirErro("Conta bancária não encontrada.");
-        } catch (SaldoInvalidoException | IllegalArgumentException e){
-            this.view.exibirErro(e.getMessage());
+        } catch (DataBaseException | RecordNotFoundException e) {
+            // Em caso de erro
+            this.view.exibirErro("Erro de banco de dados: " + e.getMessage());
+            if (db != null) {
+                try {
+                    db.runSQL("ROLLBACK;");
+                } catch (DataBaseException e2) {
+                    this.view.exibirErro("Erro crítico ao reverter a transação: " + e2.getMessage());
+                }
+            }
+
+            // Reverte alterações em memória
+            try {
+                cbOrigem.depositaValor(dQtde);
+                cbDestino.sacarValor(dQtde);
+            } catch (SaldoInvalidoException ex) {
+                // Não acontece
+            }
+            
+        } finally {
+            // Sempre fecha a conexão
+            try {
+                if (db != null) {
+                    db.closeConnection();
+                }
+            } catch (DataBaseException e) {
+                this.view.exibirErro("Erro crítico ao encerrar conexão com o banco: " + e.getMessage());
+            }
         }
     }
 }

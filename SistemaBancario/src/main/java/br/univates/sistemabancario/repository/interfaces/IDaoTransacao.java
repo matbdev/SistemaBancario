@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotFoundException;
+import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.model.Transacao;
 
 /**
@@ -13,11 +14,13 @@ public interface IDaoTransacao {
 
     /**
      * Insere um novo objeto no repositório de dados.
+     * Recebe a conexão com o banco de dados
      *
-     * @param objeto Transação a ser persistida
+     * @param objeto - transação a ser persistida
+     * @param db - banco de dados
      * @throws DataBaseException - erro de conexão
      */
-    public void create(Transacao objeto) throws DataBaseException;
+    public void create(Transacao objeto, DataBaseConnectionManager db) throws DataBaseException;
 
     /**
      * Cria um registro de transação usando uma conexão de banco de dados fornecida.

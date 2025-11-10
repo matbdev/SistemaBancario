@@ -63,7 +63,7 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
             try {
                 String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
                 db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
-                        cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
+                        cb.getNumeroConta().getNumeroInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCPF().getCpf(),
                         cb.getSaldo());
 
             } catch (DataBaseException e) {
@@ -216,16 +216,28 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-            
-            db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
-                    cb.getSaldo(), cb.getNumeroContaInt()
-            );
+            this.update(cb, db);
         } finally {
             // Fecha a conexão
             if (db != null) {
                 db.closeConnection();
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Este método não gerencia sua própria conexão
+     */
+    public void update(ContaBancaria cb, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException {
+        if (db == null) {
+            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+        }
+        
+        db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
+                cb.getSaldo(), cb.getNumeroConta().getNumeroInt()
+        );
     }
 
     /**
@@ -238,7 +250,7 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
             db = DAOFactory.getDataBaseConnectionManager();
 
             db.runPreparedSQL("DELETE FROM conta WHERE numero_conta = ?",
-                    cb.getNumeroContaInt());
+                    cb.getNumeroConta().getNumeroInt());
 
         } finally {
             // Fecha a conexão

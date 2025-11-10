@@ -34,18 +34,21 @@ public class PainelCadastroContaController {
             view.getCbCorrentista(),
             cdao
         );
-        carregarDados();
+
+        try {
+            carregarDados();
+        } catch (RecordNotReady | DataBaseException ex) {
+            this.view.exibirErro("Falha ao carregar correntistas: " + ex.getMessage());
+        }
     }
     
     /**
      * Carrega os dados no ComboBox usando o controller focado.
+     * @throws DataBaseException - erro de conexão com o banco de dados
+     * @throws RecordNotReady - erro de atributo no registro
      */
-    public void carregarDados() {
-        try {
-            this.pbbController.carregarDados();
-        } catch (RecordNotReady | DataBaseException ex) {
-            this.view.exibirErro("Falha ao carregar correntistas: " + ex.getMessage());
-        }
+    public void carregarDados() throws RecordNotReady, DataBaseException {
+        this.pbbController.carregarDados();
     }
      
     /**
