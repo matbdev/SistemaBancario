@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.service;
+package br.univates.sistemabancario.model;
 
 import br.univates.alexandria.models.Pessoa;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
@@ -81,8 +81,8 @@ public class ContaBancaria implements Comparable<ContaBancaria> {
         verificaSaldo(
                 novoSaldo,
                 String.format(
-                        "O novo saldo será menor do que R$%.2f.\nOperação cancelada",
-                        getLimite()));
+                        "O novo saldo da conta %s será menor do que R$%.2f.\nOperação cancelada",
+                        getNumeroContaFormatado(), getLimite()));
 
         this.saldo = novoSaldo;
     }

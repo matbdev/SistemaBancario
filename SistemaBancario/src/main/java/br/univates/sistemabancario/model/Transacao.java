@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.service;
+package br.univates.sistemabancario.model;
 
 import java.text.DateFormat;
 import java.util.Date;

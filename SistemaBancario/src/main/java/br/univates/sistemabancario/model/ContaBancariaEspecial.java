@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.service;
+package br.univates.sistemabancario.model;
 
 import br.univates.alexandria.models.Pessoa;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;

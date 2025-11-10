@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.service;
+package br.univates.sistemabancario.model;
 
 /**
  * Classe que representa um número da conta

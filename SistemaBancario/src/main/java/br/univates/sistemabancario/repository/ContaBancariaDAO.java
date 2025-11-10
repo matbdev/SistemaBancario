@@ -16,32 +16,13 @@ import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.exceptions.SaldoInvalidoException;
-import br.univates.sistemabancario.service.ContaBancaria;
-import br.univates.sistemabancario.service.ContaBancariaEspecial;
-import br.univates.sistemabancario.service.Numero;
+import br.univates.sistemabancario.model.ContaBancaria;
+import br.univates.sistemabancario.model.ContaBancariaEspecial;
+import br.univates.sistemabancario.model.Numero;
 
 public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
 
     public ContaBancariaDAO() {
-    }
-
-    /**
-     * {@inheritedDoc}
-     */
-    @Override
-    public void create(ContaBancaria cb, DataBaseConnectionManager db) throws DuplicatedKeyException, DataBaseException {
-        if (db == null) {
-            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-        }
-        try {
-            String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
-            db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
-                    cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
-                    cb.getSaldo());
-
-        } catch (DataBaseException e) {
-            throw new DuplicatedKeyException();
-        }
     }
 
     /**
@@ -64,8 +45,6 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
 
     /**
      * {@inheritDoc}
-     * 
-     * Este método gerencia sua própria conexão e a fecha após o uso.
      */
     @Override
     public void create(ContaBancaria cb) throws DuplicatedKeyException, DataBaseException {
@@ -76,9 +55,20 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
             // Define o número da conta como o maior cadastrado + 1
             int maxNum = this.getMaxNumeroConta(db);
             Numero novoNumero = new Numero(maxNum + 1);
-            cb.setNumeroConta(novoNumero); // Esse método só pode ser chamado uma vez, quando não há número
+            cb.setNumeroConta(novoNumero);
 
-            this.create(cb, db);
+            if (db == null) {
+                throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+            }
+            try {
+                String tipoContaStr = (cb.getTipoConta().equals("ContaBancaria")) ? "N" : "E";
+                db.runPreparedSQL("INSERT INTO conta VALUES (?,?,?,?,?);",
+                        cb.getNumeroContaInt(), tipoContaStr, cb.getLimite(), cb.getPessoa().getCpfNumbers(),
+                        cb.getSaldo());
+
+            } catch (DataBaseException e) {
+                throw new DuplicatedKeyException();
+            }
         } finally {
             // Fecha a conexão
             if (db != null) {
@@ -218,17 +208,6 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
 
     /**
      * {@inheritDoc}
-     */
-    public void update(ContaBancaria cb, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException {
-        if (db == null) {
-            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-        }
-        db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
-                cb.getSaldo(), cb.getNumeroContaInt());
-    }
-
-    /**
-     * {@inheritDoc}
      * 
      * Este método gerencia sua própria conexão e a fecha após o uso.
      */
@@ -237,7 +216,10 @@ public class ContaBancariaDAO implements IDao<ContaBancaria, Integer> {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-            this.update(cb, db);
+            
+            db.runPreparedSQL("UPDATE conta SET saldo = ? WHERE numero_conta = ?",
+                    cb.getSaldo(), cb.getNumeroContaInt()
+            );
         } finally {
             // Fecha a conexão
             if (db != null) {

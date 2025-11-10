@@ -20,23 +20,7 @@ public class CorrentistaDAO implements IDao<Pessoa, CPF> {
 
     public CorrentistaDAO() {
     }
-
-    /**
-     * {@inheritedDoc}
-     */
-    @Override
-    public void create(Pessoa p, DataBaseConnectionManager db) throws DuplicatedKeyException, DataBaseException {
-        if (db == null) {
-            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-        }
-        try {
-            db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
-                    p.getCpfNumbers(), p.getNome(), p.getEndereco());
-        } catch (DataBaseException e) {
-            throw new DuplicatedKeyException();
-        }
-    }
-
+    
     /**
      * {@inheritDoc}
      * 
@@ -47,7 +31,16 @@ public class CorrentistaDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-            this.create(p, db);
+            
+            if (db == null) {
+                throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+            }
+            try {
+                db.runPreparedSQL("INSERT INTO correntista VALUES (?,?,?);",
+                        p.getCpfNumbers(), p.getNome(), p.getEndereco());
+            } catch (DataBaseException e) {
+                throw new DuplicatedKeyException();
+            }
         } finally {
             // Fecha a conexão
             if (db != null) {
@@ -147,17 +140,6 @@ public class CorrentistaDAO implements IDao<Pessoa, CPF> {
 
     /**
      * {@inheritDoc}
-     */
-    public void update(Pessoa p, DataBaseConnectionManager db) throws RecordNotFoundException, DataBaseException {
-        if (db == null) {
-            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-        }
-        db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
-                    p.getNome(), p.getEndereco(), p.getCpfNumbers());
-    }
-
-    /**
-     * {@inheritDoc}
      * 
      * Este método gerencia sua própria conexão e a fecha após o uso.
      */
@@ -166,7 +148,10 @@ public class CorrentistaDAO implements IDao<Pessoa, CPF> {
         DataBaseConnectionManager db = null;
         try {
             db = DAOFactory.getDataBaseConnectionManager();
-            this.update(p, db);
+            
+            db.runPreparedSQL("UPDATE correntista SET nome = ?, endereco = ? WHERE cpf_correntista = ?",
+                        p.getNome(), p.getEndereco(), p.getCpfNumbers()
+            );
         } finally {
             // Fecha a conexão
             if (db != null) {
@@ -182,12 +167,11 @@ public class CorrentistaDAO implements IDao<Pessoa, CPF> {
     public void delete(Pessoa p) throws RecordNotFoundException, DataBaseException {
         DataBaseConnectionManager db = null;
         try {
-            // Abre a conexão
             db = DAOFactory.getDataBaseConnectionManager();
 
-            // Propaga DataBaseException (erro de conexão)
             db.runPreparedSQL("DELETE FROM correntista WHERE cpf_correntista = ?",
-                    p.getCpfNumbers());
+                    p.getCpfNumbers()
+            );
 
         } finally {
             // Fecha a conexão

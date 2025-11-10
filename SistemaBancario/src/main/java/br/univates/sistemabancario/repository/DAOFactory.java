@@ -11,7 +11,7 @@ import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.App;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
-import br.univates.sistemabancario.service.ContaBancaria;
+import br.univates.sistemabancario.model.ContaBancaria;
 
 /**
  * Fábrica para criar instâncias de DAOs.

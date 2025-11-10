@@ -75,4 +75,32 @@ public class Messages {
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
+    
+    /**
+     * Mostra uma mensagem de sucesso relativa a um componente "pai".
+     * @param parent - componente pai
+     * @param text - mensagem a ser exibida.
+     */
+    public static void sucessMessage(Component parent, String text) {
+        JOptionPane.showMessageDialog(
+            parent,
+            text,
+            "Sucesso",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+    
+    /**
+     * Mostra uma mensagem de falha relativa a um componente "pai".
+     * @param parent - componente pai
+     * @param text - mensagem a ser exibida.
+     */
+    public static void errorMessage(Component parent, String text) {
+        JOptionPane.showMessageDialog(
+            parent,
+            text,
+            "Erro",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
 }

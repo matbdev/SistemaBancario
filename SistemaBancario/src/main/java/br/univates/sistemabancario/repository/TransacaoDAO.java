@@ -10,8 +10,8 @@ import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotFoundException;
 import br.univates.alexandria.repository.DataBaseConnectionManager;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
-import br.univates.sistemabancario.service.Numero;
-import br.univates.sistemabancario.service.Transacao;
+import br.univates.sistemabancario.model.Numero;
+import br.univates.sistemabancario.model.Transacao;
 
 public class TransacaoDAO implements IDaoTransacao {
 
@@ -20,20 +20,30 @@ public class TransacaoDAO implements IDaoTransacao {
      * Não fecha a conexão, permitindo o uso em transações.
      *
      * @param t  - A Transacao a ser criada
-     * @param db - O gerenciador de conexão já aberto
      */
     @Override
-    public void create(Transacao t, DataBaseConnectionManager db) throws DataBaseException {
-        if (db == null) {
-            throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
-        }
+    public void create(Transacao t) throws DataBaseException {
+        DataBaseConnectionManager db = null;
         
-        String indicadorStr = String.valueOf(t.getIndicador());
-        int numeroContaInt = t.getNumero().getNumeroInt();
+        try {
+            db = DAOFactory.getDataBaseConnectionManager();
 
-        db.runPreparedSQL(
-                "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
-                numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
+            if (db == null) {
+                throw new DataBaseException("A conexão com o banco de dados não pode ser nula.");
+            }
+
+            String indicadorStr = String.valueOf(t.getIndicador());
+            int numeroContaInt = t.getNumero().getNumeroInt();
+
+            db.runPreparedSQL(
+                    "INSERT INTO transacao (numero_conta, data_transacao, descricao, valor, tipo, saldo) VALUES (?,?,?,?,?,?);",
+                    numeroContaInt, t.getDateTime(), t.getDesc(), t.getValor(), indicadorStr, t.getSaldo());
+
+        } finally {
+            if (db != null) {
+                db.closeConnection();
+            }
+        }
     }
 
     /**

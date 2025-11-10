@@ -28,17 +28,6 @@ public interface IDao<T, K> {
     public void create(T objeto) throws DuplicatedKeyException, DataBaseException;
 
     /**
-     * Insere um novo objeto no repositório de dados.
-     * Não gerencia abertura e fechamento do banco de dados.
-     *
-     * @param objeto - objeto (T) a ser persistido.
-     * @param dbcm - banco de dados responsável pelo registro
-     * @throws DuplicatedKeyException - chave duplicada
-     * @throws DataBaseException - erro de comunicação com o banco
-     */
-    public void create(T objeto, DataBaseConnectionManager dbcm) throws DuplicatedKeyException, DataBaseException;
-
-    /**
      * Busca e retorna um objeto do repositório de dados com base em sua chave primária.
      *
      * @param pkey - chave primária do objeto a ser lido.
@@ -75,17 +64,6 @@ public interface IDao<T, K> {
      * @throws DataBaseException - erro de comunicação com o banco
      */
     public void update(T objeto) throws RecordNotFoundException, DataBaseException;
-
-    /**
-     * Atualiza um objeto existente no repositório de dados.
-     * Não gerencia abertura e fechamento do banco de dados.
-     *
-     * @param objeto - objeto contendo os dados atualizados.
-     * @param dbcm - banco de dados responsável pelo registro
-     * @throws RecordNotFoundException - registro não encontrado no banco de dados
-     * @throws DataBaseException - erro de comunicação com o banco
-     */
-    public void update(T objeto, DataBaseConnectionManager dbcm) throws RecordNotFoundException, DataBaseException;
 
     /**
      * Remove um objeto do repositório de dados.
