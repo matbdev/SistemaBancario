@@ -15,7 +15,6 @@ import br.univates.sistemabancario.model.ContaBancaria;
 
 /**
  * Fábrica para criar instâncias de DAOs.
- * Esta fábrica utiliza Injeção de Dependência, recebendo a conexão
  * que será compartilhada pelos DAOs.
  */
 public class DAOFactory {

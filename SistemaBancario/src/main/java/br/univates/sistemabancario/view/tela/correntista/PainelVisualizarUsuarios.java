@@ -1,12 +1,12 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Painel destinado à visualização de todos usuários cadastrados
  * @author mateus.brambilla
  */
-public class PainelVisualizarUsuarios extends DefaultTelaMessages {
+public class PainelVisualizarUsuarios extends JFrameUtilsAdapter {
 
     public PainelVisualizarUsuarios() {
         initComponents();

@@ -1,6 +1,6 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 import br.univates.sistemabancario.view.elements.combobox.ContaBancariaComboBox;
 import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
 
@@ -9,7 +9,7 @@ import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
  * Evita repetição nas telas de movimentação e visualização das transações
  * @author mateus.brambilla
  */
-public class PainelCorrentistaContaBancaria extends DefaultTelaMessages {
+public class PainelCorrentistaContaBancaria extends JFrameUtilsAdapter {
 
     public PainelCorrentistaContaBancaria() {
         initComponents();

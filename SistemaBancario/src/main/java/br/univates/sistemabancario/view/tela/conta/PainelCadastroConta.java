@@ -1,14 +1,13 @@
 package br.univates.sistemabancario.view.tela.conta;
 
 import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Tela responsável por realizar o cadastro das contas
  * @author mateus.brambilla
  */
-public class PainelCadastroConta extends DefaultTelaMessages implements DefaultInterfaceAcaoBotao {
+public class PainelCadastroConta extends JFrameUtilsAdapter {
     public PainelCadastroConta() {
         initComponents();
     }

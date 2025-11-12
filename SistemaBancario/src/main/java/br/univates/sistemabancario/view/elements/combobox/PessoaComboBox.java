@@ -11,7 +11,7 @@ import br.univates.alexandria.models.Pessoa;
  * Modelo de combobox para correntistas
  * @author mateus.brambilla
  */
-public class PessoaComboBox extends JComboBox<Pessoa> {
+public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pessoa> {
     private final DefaultComboBoxModel<Pessoa> model;
     private ArrayList<Pessoa> al;
 
@@ -35,9 +35,9 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
     }
 
     /**
-     * Define a lista de dados para este ComboBox e atualiza a exibição.
-     * @param pessoas - nova lista de pessoas a ser exibida.
+     * {@inheritedDoc}
      */
+    @Override
     public void setDados(ArrayList<Pessoa> pessoas) {
         this.al = (pessoas != null) ? pessoas : new ArrayList<>();
         carregarItens();
@@ -56,9 +56,9 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
     }
 
     /**
-     * Seleciona um item no ComboBox com base no objeto.
-     * @param correntista - objeto a ser selecionado
+     * {@inheritedDoc}
      */
+    @Override
     public void setSelecionado(Pessoa correntista) {
         if (correntista != null && this.al.contains(correntista)) {
             model.setSelectedItem(correntista);
@@ -68,17 +68,17 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
     }
     
     /**
-     * Retorna o item selecionado, já fazendo o cast para Pessoa.
-     * @return objeto de pessoa
+     * {@inheritedDoc}
      */
+    @Override
     public Pessoa getSelecionado() {
         return (Pessoa) model.getSelectedItem();
     }
 
     /**
-     * Deleta o correntista da lista interna e do modelo de exibição.
-     * @param p - objeto de pessoa (deve estar na lista)
+     * {@inheritedDoc}
      */
+    @Override
     public void deletar(Pessoa p) {
         if (!this.al.contains(p)) {
             throw new IllegalArgumentException("Essa pessoa não está na lista de pessoas da combobox.");
@@ -88,9 +88,9 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
     }
 
     /**
-     * Adiciona uma pessoa na lista interna e no modelo de exibição.
-     * @param p - objeto de pessoa
+     * {@inheritedDoc}
      */
+    @Override
     public void adicionar(Pessoa p) {
         if (p != null && !this.al.contains(p)) {
             this.al.add(p);
@@ -99,9 +99,9 @@ public class PessoaComboBox extends JComboBox<Pessoa> {
     }
 
     /**
-     * Retorna a quantidade de itens na lista.
-     * @return tamanho da lista
+     * {@inheritedDoc}
      */
+    @Override
     public int getTamanho() {
         return this.al.size();
     }

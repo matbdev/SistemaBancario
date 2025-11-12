@@ -1,12 +1,12 @@
 package br.univates.sistemabancario.view.tela.conta;
 
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Painel destinado à visualização de todos usuários cadastrados
  * @author mateus.brambilla
  */
-public class PainelVisualizarContas extends DefaultTelaMessages {
+public class PainelVisualizarContas extends JFrameUtilsAdapter {
 
     /**
      * Creates new form PainelVisualizarUsuarios

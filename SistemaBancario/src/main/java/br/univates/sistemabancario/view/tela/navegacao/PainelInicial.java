@@ -1,12 +1,12 @@
 package br.univates.sistemabancario.view.tela.navegacao;
 
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Painel para apresentação do aplicativo
  * @author mateus.brambilla
  */
-public class PainelInicial extends javax.swing.JPanel implements DefaultInterfaceAcaoBotao {
+public class PainelInicial extends JFrameUtilsAdapter {
 
     public PainelInicial() {
         initComponents();

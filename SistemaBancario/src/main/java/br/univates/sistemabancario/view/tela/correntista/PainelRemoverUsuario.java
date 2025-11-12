@@ -1,14 +1,13 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
 import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Painel responsável por remover um usuário
  * @author mateus.brambilla
  */
-public class PainelRemoverUsuario extends DefaultTelaMessages implements DefaultInterfaceAcaoBotao {
+public class PainelRemoverUsuario extends JFrameUtilsAdapter {
 
     public PainelRemoverUsuario() {
         initComponents();

@@ -1,13 +1,12 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Tela responsável pelo cadastro de usuários
  * @author mateus.brambilla
  */
-public class PainelCadastroUsuario extends DefaultTelaMessages implements DefaultInterfaceAcaoBotao {
+public class PainelCadastroUsuario extends JFrameUtilsAdapter {
 
     public PainelCadastroUsuario() {
         initComponents();

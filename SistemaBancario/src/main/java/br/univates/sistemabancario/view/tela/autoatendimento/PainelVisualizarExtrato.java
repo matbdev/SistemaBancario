@@ -1,13 +1,13 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 import javax.swing.JTable;
 
 /**
  * Tela resposável pela visualização das movimentações de uma conta
  * @author mateus.brambilla
  */
-public class PainelVisualizarExtrato extends DefaultTelaMessages {
+public class PainelVisualizarExtrato extends JFrameUtilsAdapter {
 
     public PainelVisualizarExtrato() {
         initComponents();

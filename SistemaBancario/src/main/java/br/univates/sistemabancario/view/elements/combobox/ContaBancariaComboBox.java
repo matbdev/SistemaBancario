@@ -11,7 +11,7 @@ import br.univates.sistemabancario.model.ContaBancaria;
  * Modelo de combobox para contas bancárias
  * @author mateus.brambilla
  */
-public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
+public class ContaBancariaComboBox extends JComboBox<ContaBancaria> implements IComboBox<ContaBancaria> {
     private final DefaultComboBoxModel<ContaBancaria> model;
     private ArrayList<ContaBancaria> al;
 
@@ -31,9 +31,9 @@ public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
     }
 
     /**
-     * Define a lista de dados para este ComboBox e atualiza a exibição.
-     * @param cb - nova lista de contas bancárias a ser exibida.
+     * {@inheritedDoc}
      */
+    @Override
     public void setDados(ArrayList<ContaBancaria> cb) {
         this.al = (cb != null) ? cb : new ArrayList<>();
         carregarItens();
@@ -52,9 +52,9 @@ public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
     }
 
     /**
-     * Seleciona um item no ComboBox com base no objeto.
-     * @param cb - objeto a ser selecionado
+     * {@inheritedDoc}
      */
+    @Override
     public void setSelecionado(ContaBancaria cb) {
         if (cb != null && this.al.contains(cb)) {
             model.setSelectedItem(cb);
@@ -64,17 +64,17 @@ public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
     }
     
     /**
-     * Retorna o item selecionado, já fazendo o cast para ContaBancaria.
-     * @return objeto de ContaBancaria
+     * {@inheritedDoc}
      */
+    @Override
     public ContaBancaria getSelecionado() {
         return (ContaBancaria) model.getSelectedItem();
     }
 
     /**
-     * Deleta o correntista da lista interna e do modelo de exibição.
-     * @param cb - objeto de conta bancária (deve estar na lista)
+     * {@inheritedDoc}
      */
+    @Override
     public void deletar(ContaBancaria cb) {
         if (!this.al.contains(cb)) {
             throw new IllegalArgumentException("Essa pessoa não está na lista de pessoas da combobox.");
@@ -84,9 +84,9 @@ public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
     }
 
     /**
-     * Adiciona uma pessoa na lista interna e no modelo de exibição.
-     * @param cb - objeto de ContaBancaria
+     * {@inheritedDoc}
      */
+    @Override
     public void adicionar(ContaBancaria cb) {
         if (cb != null && !this.al.contains(cb)) {
             this.al.add(cb);
@@ -95,9 +95,9 @@ public class ContaBancariaComboBox extends JComboBox<ContaBancaria> {
     }
 
     /**
-     * Retorna a quantidade de itens na lista.
-     * @return tamanho da lista
+     * {@inheritedDoc}
      */
+    @Override
     public int getTamanho() {
         return this.al.size();
     }

@@ -1,13 +1,12 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Tela responsável por permitir uma movimentação em uma conta
  * @author mateus.brambilla
  */
-public class PainelTransferenciaConta extends DefaultTelaMessages implements DefaultInterfaceAcaoBotao {
+public class PainelTransferenciaConta extends JFrameUtilsAdapter {
 
     /**
      * Creates new form PainelDepositarConta

@@ -1,14 +1,13 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.DefaultInterfaceAcaoBotao;
 import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.DefaultTelaMessages;
+import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 
 /**
  * Painel de edição de usuário
  * @author mateus.brambilla
  */
-public class PainelEditarUsuario extends DefaultTelaMessages implements DefaultInterfaceAcaoBotao {
+public class PainelEditarUsuario extends JFrameUtilsAdapter {
 
     public PainelEditarUsuario() {
         initComponents();

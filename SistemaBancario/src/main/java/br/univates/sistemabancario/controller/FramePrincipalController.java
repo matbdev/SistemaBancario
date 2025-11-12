@@ -6,7 +6,6 @@ import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.alexandria.util.Messages;
-import br.univates.sistemabancario.controller.autoatendimento.PainelCorrentistaContaBancariaController;
 import br.univates.sistemabancario.controller.autoatendimento.PainelMovimentacaoContaController;
 import br.univates.sistemabancario.controller.autoatendimento.PainelTransferenciaContaController;
 import br.univates.sistemabancario.controller.autoatendimento.PainelVisualizarExtratoController;
@@ -16,8 +15,6 @@ import br.univates.sistemabancario.controller.correntista.PainelCadastroUsuarioC
 import br.univates.sistemabancario.controller.correntista.PainelEditarUsuarioController;
 import br.univates.sistemabancario.controller.correntista.PainelRemoverUsuarioController;
 import br.univates.sistemabancario.controller.correntista.PainelVisualizarUsuariosController;
-import br.univates.sistemabancario.controller.elements.ContaBancariaComboBoxController;
-import br.univates.sistemabancario.controller.elements.PessoaComboBoxController;
 import br.univates.sistemabancario.repository.DAOFactory;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.model.ContaBancaria;
@@ -53,7 +50,6 @@ public class FramePrincipalController {
     private IDaoTransacao tdao;
     
     // Controllers - autoatendimento
-    private PainelCorrentistaContaBancariaController painelCorrentistaContaBancariaController;
     private PainelMovimentacaoContaController painelSacarController;
     private PainelMovimentacaoContaController painelDepositarController;
     private PainelVisualizarExtratoController painelVisualizarExtratoController;
@@ -68,10 +64,6 @@ public class FramePrincipalController {
     private PainelEditarUsuarioController painelEditarUsuarioController;
     private PainelRemoverUsuarioController painelRemoverUsuarioController;
     private PainelVisualizarUsuariosController painelVisualizarUsuariosController;
-    
-    // Controllers - elements
-    private ContaBancariaComboBoxController contaBancariaComboBoxController;
-    private PessoaComboBoxController pessoaComboBoxController;
     
     // Constructor
     public FramePrincipalController(FramePrincipal view) {
@@ -232,6 +224,7 @@ public class FramePrincipalController {
         view.getDepositarMenuItem().addActionListener(e -> {
             try{
                 verificarContasVazio();
+                this.painelDepositarController.carregarDadosCombobox();
                 cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaDepositar");
             } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
@@ -242,6 +235,7 @@ public class FramePrincipalController {
         view.getPagarMenuItem().addActionListener(e -> {
             try{
                 verificarContasVazio();
+                this.painelSacarController.carregarDadosCombobox();
                 cardLayout.show(view.getPainelPrincipal(), "movimentacaoContaSacar");
             } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
@@ -256,6 +250,8 @@ public class FramePrincipalController {
                 if (cbList.size() < 2) {
                     throw new RuntimeException("Não há contas bancárias o suficiente para transferência.");
                 }
+
+                this.painelTransferenciaContaController.carregarDadosCombobox();
                 cardLayout.show(view.getPainelPrincipal(), "transferirConta");
             } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
@@ -266,7 +262,7 @@ public class FramePrincipalController {
         view.getExtratoMenuItem().addActionListener(e -> {
             try {
                 verificarContasVazio();
-                this.painelVisualizarExtratoController.carregarDados();
+                this.painelVisualizarExtratoController.carregarDadosCombobox();
                 cardLayout.show(view.getPainelPrincipal(), "visualizarExtrato");
             } catch (DataBaseException | RecordNotReady | RuntimeException ex) {
                 view.exibirErro("Erro ao carregar dados: " + ex.getMessage());
