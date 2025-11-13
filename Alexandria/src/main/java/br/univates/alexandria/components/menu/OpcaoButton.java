@@ -1,4 +1,4 @@
-package br.univates.alexandria.view;
+package br.univates.alexandria.components.menu;
 
 import br.univates.alexandria.util.FormatadorTexto;
 import br.univates.alexandria.util.Verificador;

@@ -4,7 +4,7 @@ import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.sistemabancario.model.ContaBancaria;
-import br.univates.sistemabancario.view.elements.tables.ContaTableModel;
+import br.univates.sistemabancario.view.components.ContaTableModel;
 import br.univates.sistemabancario.view.tela.conta.PainelVisualizarContas;
 
 /**

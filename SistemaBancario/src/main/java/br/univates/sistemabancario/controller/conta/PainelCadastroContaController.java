@@ -30,6 +30,15 @@ public class PainelCadastroContaController {
         this.cbdao = cbdao;
         this.view.adicionarAcaoBotao(e -> cadastrarUsuario());
         
+        // Configurar ações dos botões
+        view.getRbContaNormal().addActionListener(e -> {
+            this.view.ocultarCamposContaEspecial();
+        });
+
+        view.getRbContaEspecial().addActionListener(e -> {
+            this.view.exibirCamposContaEspecial();
+        });
+        
         this.pbbController = new PessoaComboBoxController(
             view.getCbCorrentista(),
             cdao
@@ -57,18 +66,14 @@ public class PainelCadastroContaController {
     private void cadastrarUsuario() {
         try {
             Pessoa correntista = (Pessoa) this.view.getCbCorrentista().getSelectedItem();
+            
             if (correntista == null) {
                 throw new IllegalArgumentException("Por favor, selecione um correntista.");
             }
 
-            String limiteStr = this.view.getTfLimite().getText();
-
-            // TypeCasting
-            double limite = limiteStr.isBlank() ? 0.0 : Double.parseDouble(limiteStr);
-
             ContaBancaria cb;
-            if (limite != 0) { // conta especial
-                cb = new ContaBancariaEspecial(correntista, limite, 0);
+            if (this.view.getRbContaEspecial().isSelected()) { // conta especial
+                cb = new ContaBancariaEspecial(correntista, this.view.getTfLimite().getDouble(), 0);
             } else { // conta normal
                 cb = new ContaBancaria(correntista, 0);
             }
@@ -77,7 +82,7 @@ public class PainelCadastroContaController {
             
             this.view.exibirSucesso("Conta bancária adicionada com sucesso!");
 
-            this.view.getTfLimite().setText("");
+            this.view.getTfLimite().setDouble(0);
             this.view.getCbCorrentista().setSelectedIndex(0);
 
         } catch (DataBaseException e) {

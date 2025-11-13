@@ -1,7 +1,8 @@
 package br.univates.sistemabancario.view.tela.conta;
 
-import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.combobox.PessoaComboBox;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
+import javax.swing.JRadioButton;
 
 /**
  * Tela responsável por realizar o cadastro das contas
@@ -10,6 +11,8 @@ import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
 public class PainelCadastroConta extends JFrameUtilsAdapter {
     public PainelCadastroConta() {
         initComponents();
+        getLabelLimite().setVisible(false);
+        getTfLimite().setVisible(false);
     }
     
     /**
@@ -20,13 +23,36 @@ public class PainelCadastroConta extends JFrameUtilsAdapter {
         this.botao.addActionListener(listener);
     }
     
+    // Modificar estado dos componentes via controller
+    public void exibirCamposContaEspecial() {
+        getLabelLimite().setVisible(true);
+        getTfLimite().setVisible(true);
+    }
+    
+    public void ocultarCamposContaEspecial() {
+        getLabelLimite().setVisible(false);
+        getTfLimite().setVisible(false);
+    }
+    
     // Getters
     public PessoaComboBox getCbCorrentista() {
         return this.cbCorrentista;
     }
     
-    public javax.swing.JTextPane getTfLimite(){
+    public br.univates.alexandria.components.textfield.JCurrencyField getTfLimite(){
         return this.tfLimite;
+    }
+    
+    public javax.swing.JLabel getLabelLimite() {
+        return this.labelLimite;
+    }
+    
+    public JRadioButton getRbContaNormal() {
+        return contaNormalRadioButton;
+    }
+
+    public JRadioButton getRbContaEspecial() {
+        return contaEspecialRadioButton;
     }
 
     /**
@@ -38,13 +64,16 @@ public class PainelCadastroConta extends JFrameUtilsAdapter {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        tipoContaButtonGroup = new javax.swing.ButtonGroup();
         labelTitulo = new javax.swing.JLabel();
         labelCorrentista = new javax.swing.JLabel();
         labelLimite = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tfLimite = new javax.swing.JTextPane();
         botao = new javax.swing.JButton();
-        cbCorrentista = new br.univates.sistemabancario.view.elements.combobox.PessoaComboBox();
+        cbCorrentista = new br.univates.alexandria.components.combobox.PessoaComboBox();
+        tfLimite = new br.univates.alexandria.components.textfield.JCurrencyField();
+        contaEspecialRadioButton = new javax.swing.JRadioButton();
+        contaNormalRadioButton = new javax.swing.JRadioButton();
+        labelTipoConta = new javax.swing.JLabel();
 
         labelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -52,11 +81,26 @@ public class PainelCadastroConta extends JFrameUtilsAdapter {
 
         labelCorrentista.setText("Correntista");
 
-        labelLimite.setText("Limite (opcional)");
-
-        jScrollPane1.setViewportView(tfLimite);
+        labelLimite.setLabelFor(tfLimite);
+        labelLimite.setText("Limite");
 
         botao.setText("Cadastrar");
+
+        tfLimite.setText("jCurrencyField1");
+
+        tipoContaButtonGroup.add(contaEspecialRadioButton);
+        contaEspecialRadioButton.setText("Conta Especial");
+
+        tipoContaButtonGroup.add(contaNormalRadioButton);
+        contaNormalRadioButton.setSelected(true);
+        contaNormalRadioButton.setText("Conta Normal");
+        contaNormalRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contaNormalRadioButtonActionPerformed(evt);
+            }
+        });
+
+        labelTipoConta.setText("Tipo de Conta");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -66,14 +110,22 @@ public class PainelCadastroConta extends JFrameUtilsAdapter {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(labelCorrentista)
-                            .addComponent(labelLimite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbCorrentista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(botao))
-                    .addComponent(cbCorrentista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelCorrentista)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(contaNormalRadioButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(contaEspecialRadioButton))
+                            .addComponent(labelTipoConta))
+                        .addGap(38, 38, 38)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelLimite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tfLimite, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -85,25 +137,36 @@ public class PainelCadastroConta extends JFrameUtilsAdapter {
                 .addComponent(labelCorrentista)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbCorrentista, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelLimite)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(botao))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelTipoConta)
+                    .addComponent(labelLimite))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(contaNormalRadioButton)
+                    .addComponent(contaEspecialRadioButton)
+                    .addComponent(tfLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addComponent(botao)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void contaNormalRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contaNormalRadioButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_contaNormalRadioButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botao;
-    private br.univates.sistemabancario.view.elements.combobox.PessoaComboBox cbCorrentista;
-    private javax.swing.JScrollPane jScrollPane1;
+    private br.univates.alexandria.components.combobox.PessoaComboBox cbCorrentista;
+    private javax.swing.JRadioButton contaEspecialRadioButton;
+    private javax.swing.JRadioButton contaNormalRadioButton;
     private javax.swing.JLabel labelCorrentista;
     private javax.swing.JLabel labelLimite;
+    private javax.swing.JLabel labelTipoConta;
     private javax.swing.JLabel labelTitulo;
-    private javax.swing.JTextPane tfLimite;
+    private br.univates.alexandria.components.textfield.JCurrencyField tfLimite;
+    private javax.swing.ButtonGroup tipoContaButtonGroup;
     // End of variables declaration//GEN-END:variables
 }

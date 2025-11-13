@@ -1,6 +1,6 @@
 package br.univates.sistemabancario.view.tela.navegacao;
 
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 
 /**
  * Painel para apresentação do aplicativo

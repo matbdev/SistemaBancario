@@ -70,7 +70,6 @@ public class PainelTransferenciaContaController {
      * Método responsável por depositar um valor na conta selecionada
      */
     private void transferirValor() {
-        String strQtd = this.view.getQuantidadeTf().getText();
         Double dQtde;
         ContaBancaria cbOrigem;
         ContaBancaria cbDestino;
@@ -78,8 +77,7 @@ public class PainelTransferenciaContaController {
         Transacao tDestino;
 
         try {
-            strQtd = this.view.getQuantidadeTf().getText();
-            dQtde = Double.valueOf(strQtd);
+            dQtde = this.view.getQuantidadeTf().getDouble();
             
             cbOrigem = this.pccControllerOrigem.getContaSelecionada();
             cbDestino = this.pccControllerDestino.getContaSelecionada();
@@ -138,7 +136,7 @@ public class PainelTransferenciaContaController {
             this.view.exibirSucesso("Conta de origem: \n\n" + cbOrigem.consultarStatus());
             this.view.exibirSucesso("Conta de destino: \n\n" + cbDestino.consultarStatus());
             
-            this.view.getQuantidadeTf().setText("");
+            this.view.getQuantidadeTf().setDouble(0);
             this.view.getPainelCorrentistaContaBancariaOrigem().getCbContaBancaria().setSelecionado(null);
             this.view.getPainelCorrentistaContaBancariaOrigem().getCbCorrentista().setSelecionado(null);
             this.view.getPainelCorrentistaContaBancariaDestino().getCbContaBancaria().setSelecionado(null);

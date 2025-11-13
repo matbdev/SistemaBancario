@@ -57,7 +57,7 @@ public class PainelEditarUsuarioController {
             this.view.getEndereco().setEditable(true);
             this.view.getNome().setText(correntista.getNome());
             this.view.getNome().setEditable(true);
-            this.view.getCpf().setText(correntista.getCPF().getCpfFormatado());
+            this.view.getCpf().setCpf(correntista.getCPF());
         } else {
             this.view.getEndereco().setText("");
             this.view.getEndereco().setEditable(false);

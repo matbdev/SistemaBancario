@@ -1,6 +1,6 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 
 /**
  * Tela responsável pelo cadastro de usuários
@@ -13,7 +13,7 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
     }
     
     // Getters
-    public javax.swing.JFormattedTextField getCpf() {
+    public br.univates.alexandria.components.textfield.JCpfField getCpf() {
         return textCpf;
     }
     
@@ -21,7 +21,7 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
         return textEndereco;
     }
     
-    public javax.swing.JTextPane getNome() {
+    public br.univates.alexandria.components.textfield.JOnlyTextField getNome() {
         return textNome;
     }
     
@@ -44,14 +44,17 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
 
         labelTitulo = new javax.swing.JLabel();
         labelNome = new javax.swing.JLabel();
-        textCpf = new javax.swing.JFormattedTextField();
         labelCpf = new javax.swing.JLabel();
         labelEndereco = new javax.swing.JLabel();
         botao = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textNome = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         textEndereco = new javax.swing.JTextPane();
+        try {
+            textCpf = new br.univates.alexandria.components.textfield.JCpfField();
+        } catch (java.text.ParseException e1) {
+            e1.printStackTrace();
+        }
+        textNome = new br.univates.alexandria.components.textfield.JOnlyTextField();
 
         labelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -60,12 +63,6 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
 
         labelNome.setText("Nome Completo");
 
-        try {
-            textCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-
         labelCpf.setLabelFor(labelNome);
         labelCpf.setText("CPF");
 
@@ -73,8 +70,6 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
         labelEndereco.setText("Endereço");
 
         botao.setText("Cadastrar");
-
-        jScrollPane1.setViewportView(textNome);
 
         jScrollPane2.setViewportView(textEndereco);
 
@@ -91,19 +86,21 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(labelEndereco, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(labelCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(24, 24, 24)
+                                .addComponent(labelCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(labelNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane1))))))
+                                    .addComponent(textNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                 .addGap(6, 6, 6))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(labelEndereco, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -116,9 +113,9 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
                     .addComponent(labelNome)
                     .addComponent(labelCpf))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(labelEndereco)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -132,14 +129,13 @@ public class PainelCadastroUsuario extends JFrameUtilsAdapter {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botao;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel labelCpf;
     private javax.swing.JLabel labelEndereco;
     private javax.swing.JLabel labelNome;
     private javax.swing.JLabel labelTitulo;
-    private javax.swing.JFormattedTextField textCpf;
+    private br.univates.alexandria.components.textfield.JCpfField textCpf;
     private javax.swing.JTextPane textEndereco;
-    private javax.swing.JTextPane textNome;
+    private br.univates.alexandria.components.textfield.JOnlyTextField textNome;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements;
+package br.univates.alexandria.components;
 
 import br.univates.alexandria.util.Messages;
 

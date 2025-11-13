@@ -28,8 +28,12 @@ public class PainelCadastroUsuarioController {
     private void cadastrarUsuario() {
         try {
             String nome = this.view.getNome().getText();
-            String cpf = this.view.getCpf().getText();
+            CPF cpf = this.view.getCpf().getCpf();
             String endereco = this.view.getEndereco().getText();
+            
+            if (cpf == null){
+                throw new CpfInvalidoException("");
+            }
 
             Pessoa pessoa = new Pessoa(cpf, nome, endereco);
             cdao.create(pessoa);

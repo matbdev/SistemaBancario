@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements.tables;
+package br.univates.sistemabancario.view.components;
 
 import br.univates.sistemabancario.model.ContaBancaria;
 

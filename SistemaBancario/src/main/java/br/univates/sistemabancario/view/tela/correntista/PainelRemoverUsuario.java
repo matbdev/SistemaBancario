@@ -1,7 +1,7 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.combobox.PessoaComboBox;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 
 /**
  * Painel responsável por remover um usuário
@@ -38,7 +38,7 @@ public class PainelRemoverUsuario extends JFrameUtilsAdapter {
         labelTitulo = new javax.swing.JLabel();
         labelCorrentista = new javax.swing.JLabel();
         botao = new javax.swing.JButton();
-        cbCorrentista = new br.univates.sistemabancario.view.elements.combobox.PessoaComboBox();
+        cbCorrentista = new br.univates.alexandria.components.combobox.PessoaComboBox();
 
         labelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -83,7 +83,7 @@ public class PainelRemoverUsuario extends JFrameUtilsAdapter {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botao;
-    private br.univates.sistemabancario.view.elements.combobox.PessoaComboBox cbCorrentista;
+    private br.univates.alexandria.components.combobox.PessoaComboBox cbCorrentista;
     private javax.swing.JLabel labelCorrentista;
     private javax.swing.JLabel labelTitulo;
     // End of variables declaration//GEN-END:variables

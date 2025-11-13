@@ -1,4 +1,4 @@
-package br.univates.alexandria.view;
+package br.univates.alexandria.components.menu;
 
 import java.awt.Color;
 import java.awt.Frame;

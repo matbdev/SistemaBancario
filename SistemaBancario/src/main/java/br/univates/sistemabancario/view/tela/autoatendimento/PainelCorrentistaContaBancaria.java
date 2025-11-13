@@ -1,8 +1,8 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
-import br.univates.sistemabancario.view.elements.combobox.ContaBancariaComboBox;
-import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
+import br.univates.sistemabancario.view.components.ContaBancariaComboBox;
+import br.univates.alexandria.components.combobox.PessoaComboBox;
 
 /**
  * Painel com as duas combobox, de pessoa e conta bancária
@@ -42,8 +42,8 @@ public class PainelCorrentistaContaBancaria extends JFrameUtilsAdapter {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pessoaComboBox = new br.univates.sistemabancario.view.elements.combobox.PessoaComboBox();
-        contaBancariaComboBox = new br.univates.sistemabancario.view.elements.combobox.ContaBancariaComboBox();
+        pessoaComboBox = new br.univates.alexandria.components.combobox.PessoaComboBox();
+        contaBancariaComboBox = new br.univates.sistemabancario.view.components.ContaBancariaComboBox();
         labelContaBancaria = new javax.swing.JLabel();
         labelCorrentista = new javax.swing.JLabel();
 
@@ -87,9 +87,9 @@ public class PainelCorrentistaContaBancaria extends JFrameUtilsAdapter {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private br.univates.sistemabancario.view.elements.combobox.ContaBancariaComboBox contaBancariaComboBox;
+    private br.univates.sistemabancario.view.components.ContaBancariaComboBox contaBancariaComboBox;
     private javax.swing.JLabel labelContaBancaria;
     private javax.swing.JLabel labelCorrentista;
-    private br.univates.sistemabancario.view.elements.combobox.PessoaComboBox pessoaComboBox;
+    private br.univates.alexandria.components.combobox.PessoaComboBox pessoaComboBox;
     // End of variables declaration//GEN-END:variables
 }

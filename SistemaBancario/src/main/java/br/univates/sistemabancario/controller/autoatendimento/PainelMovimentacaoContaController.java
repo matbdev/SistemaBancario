@@ -151,7 +151,7 @@ public class PainelMovimentacaoContaController {
                 // Em caso de sucesso
                 db.runSQL("COMMIT;");
                 this.view.exibirSucesso("Sucesso na transação! \n\n" + cb.consultarStatus());
-                this.view.getQuantidadeTf().setText("");
+                this.view.getQuantidadeTf().setDouble(0);
                 this.view.getPainelCorrentistaContaBancaria().getCbContaBancaria().setSelecionado(null);
                 this.view.getPainelCorrentistaContaBancaria().getCbCorrentista().setSelecionado(null);
     
@@ -197,8 +197,7 @@ public class PainelMovimentacaoContaController {
      */
     private InfoMovimentacao prepararDeposito() {
         try {
-            String strQtd = this.view.getQuantidadeTf().getText();
-            Double dQtde = Double.valueOf(strQtd);
+            Double dQtde = this.view.getQuantidadeTf().getDouble();
             ContaBancaria cb = this.pccController.getContaSelecionada();
             
             if (cb == null){
@@ -231,8 +230,7 @@ public class PainelMovimentacaoContaController {
      */
     private InfoMovimentacao prepararSaque() {
         try {
-            String strQtd = this.view.getQuantidadeTf().getText();
-            Double dQtde = Double.valueOf(strQtd);
+            Double dQtde = this.view.getQuantidadeTf().getDouble();
             ContaBancaria cb = this.pccController.getContaSelecionada();
             
             if (cb == null){

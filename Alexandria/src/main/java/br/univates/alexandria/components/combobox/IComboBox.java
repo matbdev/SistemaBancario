@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements.combobox;
+package br.univates.alexandria.components.combobox;
 
 import java.util.ArrayList;
 

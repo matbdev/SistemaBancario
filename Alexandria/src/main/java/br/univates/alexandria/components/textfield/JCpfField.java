@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements.textfield;
+package br.univates.alexandria.components.textfield;
 
 import java.awt.Color;
 import java.text.ParseException;
@@ -30,23 +30,39 @@ public class JCpfField extends JFormattedTextField {
                 String cpf = getText();
         
                 // Valida o CPF
-                if (!validarCPF(cpf)) setBorder(failBorder);
+                if (getCpf() == null) setBorder(failBorder);
                 else setBorder(successBorder);
             }
         });
     }
     
     /**
-     * Método privado que realiza a validação do CPF
-     * @param cpf - cpf em formato de string
-     * @return booleano relativo à validade desse cpf
+     * Método que remove os focos
+     * Necessário para melhorar experiência do usuário na minha tela de edição
      */
-    private boolean validarCPF(String cpf) {
-        try{
-            new CPF(cpf);
-            return true;
-        } catch (CpfInvalidoException e){
-            return false;
+    public void removeFocus() {
+        for (java.awt.event.FocusListener listener : getFocusListeners()) {
+            removeFocusListener(listener);
         }
+    }
+    
+    /**
+     * Método auxiliar que já retorna um cpf instanciado
+     * @return - objeto instanciado de cpf ou nulo
+     */
+    public CPF getCpf() {
+        try{
+            return new CPF(this.getText());
+        } catch (CpfInvalidoException e){
+            return null;
+        }
+    }
+    
+    /**
+     * Método que escreve um cpf
+     * @param cpf - objeto instanciado de cpf
+     */
+    public void setCpf(CPF cpf) {
+        setText(cpf.getCpf());
     }
 }

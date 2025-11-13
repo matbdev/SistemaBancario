@@ -1,6 +1,6 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 
 /**
  * Tela responsável por permitir uma movimentação em uma conta
@@ -20,7 +20,7 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
         return this.painelCorrentistaContaBancaria;
     }
     
-    public javax.swing.JTextPane getQuantidadeTf(){
+    public br.univates.alexandria.components.textfield.JCurrencyField getQuantidadeTf(){
         return this.quantidadeTf;
     }
     
@@ -52,9 +52,8 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
         painelCorrentistaContaBancaria = new br.univates.sistemabancario.view.tela.autoatendimento.PainelCorrentistaContaBancaria();
         labelTituloEdicaoCorrentista = new javax.swing.JLabel();
         labelQuantidade = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        quantidadeTf = new javax.swing.JTextPane();
         botao = new javax.swing.JButton();
+        quantidadeTf = new br.univates.alexandria.components.textfield.JCurrencyField();
 
         labelTituloEdicaoCorrentista.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTituloEdicaoCorrentista.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -62,14 +61,14 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
 
         labelQuantidade.setText("Quantidade");
 
-        jScrollPane1.setViewportView(quantidadeTf);
-
         botao.setText("Ação");
         botao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botaoActionPerformed(evt);
             }
         });
+
+        quantidadeTf.setText("jCurrencyField1");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -84,7 +83,7 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
                         .addComponent(labelQuantidade)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(quantidadeTf, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(botao)))
                 .addContainerGap())
@@ -99,9 +98,9 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(labelQuantidade)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botao))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(botao)
+                    .addComponent(quantidadeTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -113,10 +112,9 @@ public class PainelMovimentacaoConta extends JFrameUtilsAdapter {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botao;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelQuantidade;
     private javax.swing.JLabel labelTituloEdicaoCorrentista;
     private br.univates.sistemabancario.view.tela.autoatendimento.PainelCorrentistaContaBancaria painelCorrentistaContaBancaria;
-    private javax.swing.JTextPane quantidadeTf;
+    private br.univates.alexandria.components.textfield.JCurrencyField quantidadeTf;
     // End of variables declaration//GEN-END:variables
 }

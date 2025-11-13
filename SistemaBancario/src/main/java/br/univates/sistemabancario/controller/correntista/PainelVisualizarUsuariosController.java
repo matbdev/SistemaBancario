@@ -5,7 +5,7 @@ import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
-import br.univates.sistemabancario.view.elements.tables.PessoaTableModel;
+import br.univates.alexandria.components.table.PessoaTableModel;
 import br.univates.sistemabancario.view.tela.correntista.PainelVisualizarUsuarios;
 
 /**

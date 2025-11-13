@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements;
+package br.univates.alexandria.components;
 
 /**
  * Interface com método para definir ação do botão

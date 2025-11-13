@@ -4,7 +4,7 @@ import br.univates.alexandria.exceptions.DataBaseException;
 import br.univates.alexandria.exceptions.RecordNotReady;
 import br.univates.alexandria.interfaces.IDao;
 import br.univates.sistemabancario.model.ContaBancaria;
-import br.univates.sistemabancario.view.elements.combobox.ContaBancariaComboBox;
+import br.univates.sistemabancario.view.components.ContaBancariaComboBox;
 import java.util.ArrayList;
 
 /**

@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements.tables;
+package br.univates.alexandria.components.table;
 
 import br.univates.alexandria.models.Pessoa;
 

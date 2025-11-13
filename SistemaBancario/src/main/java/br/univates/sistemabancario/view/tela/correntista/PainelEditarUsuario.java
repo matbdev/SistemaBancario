@@ -1,7 +1,7 @@
 package br.univates.sistemabancario.view.tela.correntista;
 
-import br.univates.sistemabancario.view.elements.combobox.PessoaComboBox;
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.combobox.PessoaComboBox;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 
 /**
  * Painel de edição de usuário
@@ -11,6 +11,7 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
 
     public PainelEditarUsuario() {
         initComponents();
+        this.textCpf.removeFocus();
     }
     
     // Getters
@@ -18,7 +19,7 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
         return cbCorrentista;
     }
     
-    public javax.swing.JFormattedTextField getCpf() {
+    public br.univates.alexandria.components.textfield.JCpfField getCpf() {
         return textCpf;
     }
     
@@ -26,7 +27,7 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
         return textEndereco;
     }
     
-    public javax.swing.JTextPane getNome() {
+    public br.univates.alexandria.components.textfield.JOnlyTextField getNome() {
         return textNome;
     }
     
@@ -53,17 +54,20 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
     private void initComponents() {
 
         labelTitulo = new javax.swing.JLabel();
-        cbCorrentista = new br.univates.sistemabancario.view.elements.combobox.PessoaComboBox();
+        cbCorrentista = new br.univates.alexandria.components.combobox.PessoaComboBox();
         labelCorrentista = new javax.swing.JLabel();
         labelEndereco = new javax.swing.JLabel();
         botao = new javax.swing.JButton();
         labelCpf = new javax.swing.JLabel();
-        textCpf = new javax.swing.JFormattedTextField();
         labelNome = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textNome = new javax.swing.JTextPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         textEndereco = new javax.swing.JTextPane();
+        try {
+            textCpf = new br.univates.alexandria.components.textfield.JCpfField();
+        } catch (java.text.ParseException e1) {
+            e1.printStackTrace();
+        }
+        textNome = new br.univates.alexandria.components.textfield.JOnlyTextField();
 
         labelTitulo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -80,19 +84,19 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
 
         labelCpf.setText("CPF");
 
-        try {
-            textCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
-        } catch (java.text.ParseException ex) {
-            ex.printStackTrace();
-        }
-        textCpf.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        textCpf.setEnabled(false);
-
         labelNome.setText("Nome Completo");
 
-        jScrollPane1.setViewportView(textNome);
-
         jScrollPane2.setViewportView(textEndereco);
+
+        textCpf.setEditable(false);
+        textCpf.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                textCpfFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textCpfFocusLost(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -107,12 +111,12 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
                         .addComponent(botao))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(labelCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(24, 24, 24)
+                            .addComponent(labelCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(labelNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1)))
+                            .addComponent(textNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(labelCorrentista)
@@ -136,9 +140,9 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
                     .addComponent(labelNome)
                     .addComponent(labelCpf))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(textNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(labelEndereco)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -149,19 +153,26 @@ public class PainelEditarUsuario extends JFrameUtilsAdapter {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void textCpfFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textCpfFocusGained
+        textCpf.setBorder(null);
+    }//GEN-LAST:event_textCpfFocusGained
+
+    private void textCpfFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textCpfFocusLost
+        textCpf.setBorder(null);
+    }//GEN-LAST:event_textCpfFocusLost
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botao;
-    private br.univates.sistemabancario.view.elements.combobox.PessoaComboBox cbCorrentista;
-    private javax.swing.JScrollPane jScrollPane1;
+    private br.univates.alexandria.components.combobox.PessoaComboBox cbCorrentista;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel labelCorrentista;
     private javax.swing.JLabel labelCpf;
     private javax.swing.JLabel labelEndereco;
     private javax.swing.JLabel labelNome;
     private javax.swing.JLabel labelTitulo;
-    private javax.swing.JFormattedTextField textCpf;
+    private br.univates.alexandria.components.textfield.JCpfField textCpf;
     private javax.swing.JTextPane textEndereco;
-    private javax.swing.JTextPane textNome;
+    private br.univates.alexandria.components.textfield.JOnlyTextField textNome;
     // End of variables declaration//GEN-END:variables
 }

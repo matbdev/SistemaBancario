@@ -8,7 +8,7 @@ import br.univates.alexandria.models.CPF;
 import br.univates.alexandria.models.Pessoa;
 import br.univates.sistemabancario.repository.interfaces.IDaoTransacao;
 import br.univates.sistemabancario.model.ContaBancaria;
-import br.univates.sistemabancario.view.elements.tables.ExtratoTableModel;
+import br.univates.sistemabancario.view.components.ExtratoTableModel;
 import br.univates.sistemabancario.view.tela.autoatendimento.PainelCorrentistaContaBancaria;
 import br.univates.sistemabancario.view.tela.autoatendimento.PainelVisualizarExtrato;
 

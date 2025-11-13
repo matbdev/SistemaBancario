@@ -1,6 +1,6 @@
 package br.univates.sistemabancario.view.tela.autoatendimento;
 
-import br.univates.sistemabancario.view.elements.JFrameUtilsAdapter;
+import br.univates.alexandria.components.JFrameUtilsAdapter;
 import javax.swing.JTable;
 
 /**

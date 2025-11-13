@@ -1,4 +1,4 @@
-package br.univates.sistemabancario.view.elements.textfield;
+package br.univates.alexandria.components.textfield;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.text.NumberFormatter;
@@ -13,6 +13,7 @@ public class JCurrencyField extends JFormattedTextField {
         setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         NumberFormatter nf = (NumberFormatter)this.getFormatter();
         nf.setAllowsInvalid(false);
+        setDouble(0);
     }
     
     /**

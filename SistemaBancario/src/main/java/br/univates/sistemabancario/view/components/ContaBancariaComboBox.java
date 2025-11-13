@@ -1,33 +1,30 @@
-package br.univates.sistemabancario.view.elements.combobox;
+package br.univates.sistemabancario.view.components;
 
+import br.univates.alexandria.components.combobox.IComboBox;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 
-import br.univates.alexandria.models.Pessoa;
+import br.univates.sistemabancario.model.ContaBancaria;
 
 /**
- * Modelo de combobox para correntistas
+ * Modelo de combobox para contas bancárias
  * @author mateus.brambilla
  */
-public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pessoa> {
-    private final DefaultComboBoxModel<Pessoa> model;
-    private ArrayList<Pessoa> al;
+public class ContaBancariaComboBox extends JComboBox<ContaBancaria> implements IComboBox<ContaBancaria> {
+    private final DefaultComboBoxModel<ContaBancaria> model;
+    private ArrayList<ContaBancaria> al;
 
     //Constructor overload
-    public PessoaComboBox() {
+    public ContaBancariaComboBox() {
         this.model = new DefaultComboBoxModel<>();
         this.al = new ArrayList<>();
         setModel(model);
         carregarItens();
     }
     
-    /**
-     * Construtor que recebe a lista de itens.
-     * @param al - lista com os objetos de Pessoa
-     */
-    public PessoaComboBox(ArrayList<Pessoa> al) {
+    public ContaBancariaComboBox(ArrayList<ContaBancaria> al) {
         this.model = new DefaultComboBoxModel<>();
         this.al = (al != null) ? al : new ArrayList<>();
         setModel(model);
@@ -38,8 +35,8 @@ public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pesso
      * {@inheritedDoc}
      */
     @Override
-    public void setDados(ArrayList<Pessoa> pessoas) {
-        this.al = (pessoas != null) ? pessoas : new ArrayList<>();
+    public void setDados(ArrayList<ContaBancaria> cb) {
+        this.al = (cb != null) ? cb : new ArrayList<>();
         carregarItens();
     }
     
@@ -50,7 +47,7 @@ public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pesso
         model.removeAllElements();
         model.addElement(null);
 
-        for (Pessoa p : this.al) {
+        for (ContaBancaria p : this.al) {
             model.addElement(p);
         }
     }
@@ -59,9 +56,9 @@ public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pesso
      * {@inheritedDoc}
      */
     @Override
-    public void setSelecionado(Pessoa correntista) {
-        if (correntista != null && this.al.contains(correntista)) {
-            model.setSelectedItem(correntista);
+    public void setSelecionado(ContaBancaria cb) {
+        if (cb != null && this.al.contains(cb)) {
+            model.setSelectedItem(cb);
         } else {
             model.setSelectedItem(null);
         }
@@ -71,30 +68,30 @@ public class PessoaComboBox extends JComboBox<Pessoa> implements IComboBox<Pesso
      * {@inheritedDoc}
      */
     @Override
-    public Pessoa getSelecionado() {
-        return (Pessoa) model.getSelectedItem();
+    public ContaBancaria getSelecionado() {
+        return (ContaBancaria) model.getSelectedItem();
     }
 
     /**
      * {@inheritedDoc}
      */
     @Override
-    public void deletar(Pessoa p) {
-        if (!this.al.contains(p)) {
+    public void deletar(ContaBancaria cb) {
+        if (!this.al.contains(cb)) {
             throw new IllegalArgumentException("Essa pessoa não está na lista de pessoas da combobox.");
         }
-        this.al.remove(p);
-        model.removeElement(p);
+        this.al.remove(cb);
+        model.removeElement(cb);
     }
 
     /**
      * {@inheritedDoc}
      */
     @Override
-    public void adicionar(Pessoa p) {
-        if (p != null && !this.al.contains(p)) {
-            this.al.add(p);
-            model.addElement(p);
+    public void adicionar(ContaBancaria cb) {
+        if (cb != null && !this.al.contains(cb)) {
+            this.al.add(cb);
+            model.addElement(cb);
         }
     }
 
